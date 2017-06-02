@@ -1,0 +1,118 @@
+<link rel="import" href="../polymer/polymer-element.html">
+<link rel="import" href="../iron-pages/iron-pages.html">
+<link rel="import" href="../paper-button/paper-button.html">
+<link rel="import" href="../paper-progress/paper-progress.html">
+<link rel="import" href="../paper-radio-group/paper-radio-group.html">
+
+<dom-module id="hook-quiz-mini">
+  <template>
+    <style>
+      :host {
+        display: block;
+      }
+
+      p {
+        font-size: 2em;
+        line-height: 1em;
+      }
+
+      paper-progress {
+        width: 100%;
+      }
+
+      paper-radio-group {
+        display: flex;
+        flex-direction: column;
+      }
+
+      paper-button {
+        background: navy;
+        color: white;
+      }
+    </style>
+    <paper-progress value="[[_getProgress(currentQuestion, questions)]]"></paper-progress>
+    <iron-pages selected="[[currentQuestion]]">
+      <template is="dom-repeat" items="[[questions]]" as="question">
+        <div>
+          <p>[[question.text]]</p>
+          <paper-radio-group selected="[[_getAnswer(index, answers)]]" on-paper-radio-group-changed="_setAnswer">
+            <template is="dom-repeat" items="[[question.choices]]" as="choice">
+              <paper-radio-button name="[[choice]]">[[choice]]</paper-radio-button>
+            </template>
+          </paper-radio-group>
+        </div>
+      </template>
+      <div>
+        <p>You scored [[score]]%!</p>
+        <paper-button raised on-click="_questionsChanged">Reset</paper-button>
+      </div>
+    </iron-pages>
+  </template>
+
+  <script>
+    /**
+     * `hook-quiz-mini`
+     * does my element stuff
+     *
+     * @customElement
+     * @polymer
+     * @demo demo/index.html
+     */
+    class HookQuizMini extends Polymer.Element {
+      static get is() { return 'hook-quiz-mini'; }
+      static get properties() {
+        return {
+          questions: {
+            type: Array,
+            value: () => [],
+            observer: '_questionsChanged'
+          },
+          currentQuestion: {
+            type: Number,
+            value: 0
+          },
+          answers: {
+            type: Array,
+            value: () => [],
+            observer: '_answersChanged'
+          },
+          score: {
+            type: Number,
+            value: 0
+          }
+        };
+      }
+
+      _questionsChanged() {
+        this.answers = this.questions.map(value => '');
+        this.currentQuestion = 0;
+      }
+
+      _answersChanged() {
+        const {questions, answers} = this;
+        const correct = answers.reduce((acc, value, index) => (
+          acc + (value === questions[index].answer)
+        ), 0);
+        const score = Math.round(correct / questions.length * 100);
+        this.score = score;
+      }
+
+      _getProgress(currentQuestion, questions) {
+        return (currentQuestion + 1) / questions.length * 100;
+      }
+
+      _getAnswer(index, answers) {
+        return answers[index];
+      }
+
+      _setAnswer(e) {
+        this.answers = [...this.answers].map((value, index) => (
+          value = (index === e.model.index) ? e.target.selected : value
+        ));
+        this.currentQuestion++;
+      }
+    }
+
+    window.customElements.define(HookQuizMini.is, HookQuizMini);
+  </script>
+</dom-module>
