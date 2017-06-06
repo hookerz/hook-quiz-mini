@@ -103,6 +103,12 @@
         };
       }
 
+      ready() {
+        super.ready();
+
+        this.animation;
+      }
+
       _reset() {
         this.currentQuestion = 0;
         this.responses = this.questions.map(question => null);
@@ -143,14 +149,14 @@
         // has completed
 
         console.log('start animation here');
-        this._animateInOut();
+        this._exitAnimation();
 
         Polymer.Async.microTask.run(() => {
           const currentQuestion = this.currentQuestion;
           this.responses = this.responses.map((response, index) => (
             response = (index === currentQuestion) ? e.target.selected : response
           ));
-          this.currentQuestion++;
+          // this.currentQuestion++;
           console.log('finish animation here');
         });
       }
@@ -163,8 +169,8 @@
         return currentQuestion < totalQuestions ? 'questions' : 'score';
       }
 
-      _animateInOut() {
-        let animation = this.$.questionsPanel.animate([
+      _exitAnimation() {
+        this.animation = this.$.questionsPanel.animate([
           {transform: 'translateX(0)', opacity: 1},
           {transform: 'translateX(100%)', opacity: 0},
           {transform: 'translateX(-100%)', opacity: 0},
@@ -174,10 +180,26 @@
           easing: 'cubic-bezier(0.4, 0, 0.2, 1)',
           fill: 'both'
         });
-        animation.onfinish = (e) => {
-          console.log('anim finished');
+
+        this.animation.onfinish = (e) => {
+          this.currentQuestion++;
+          this._enterAnimation.bind(this);
         };
       }
+
+      _enterAnimation() {
+        this.animation = this.$.questionsPanel.animate([
+          {transform: 'translateX(-100%)', opacity: 0},
+          {transform: 'translateX(0)', opacity: 1}
+        ], {
+          duration: 400,
+          easing: 'cubic-bezier(0.4, 0, 0.2, 1)',
+          fill: 'both'
+        });
+      }
+
+
+
     }
 
     window.customElements.define(HookQuizMini.is, HookQuizMini);
