@@ -103,12 +103,6 @@
         };
       }
 
-      ready() {
-        super.ready();
-
-        this.animation;
-      }
-
       _reset() {
         this.currentQuestion = 0;
         this.responses = this.questions.map(question => null);
@@ -170,35 +164,31 @@
       }
 
       _exitAnimation() {
-        this.animation = this.$.questionsPanel.animate([
+        let enterAnimation = this.$.questionsPanel.animate([
           {transform: 'translateX(0)', opacity: 1},
-          {transform: 'translateX(100%)', opacity: 0},
-          {transform: 'translateX(-100%)', opacity: 0},
-          {transform: 'translateX(0)', opacity: 1}
+          {transform: 'translateX(100%)', opacity: 0}
         ], {
           duration: 300,
           easing: 'cubic-bezier(0.4, 0, 0.2, 1)',
           fill: 'both'
         });
 
-        this.animation.onfinish = (e) => {
+        enterAnimation.onfinish = (e) => {
           this.currentQuestion++;
-          this._enterAnimation.bind(this);
+          this._enterAnimation();
         };
       }
 
       _enterAnimation() {
-        this.animation = this.$.questionsPanel.animate([
+        this.$.questionsPanel.animate([
           {transform: 'translateX(-100%)', opacity: 0},
           {transform: 'translateX(0)', opacity: 1}
         ], {
-          duration: 400,
-          easing: 'cubic-bezier(0.4, 0, 0.2, 1)',
+          duration: 300,
+          easing: 'cubic-bezier(.17,.67,0,1.09)',
           fill: 'both'
         });
       }
-
-
 
     }
 
