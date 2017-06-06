@@ -10,6 +10,8 @@
     <style>
       :host {
         display: block;
+        position: relative;
+        overflow: hidden;
       }
 
       p {
@@ -32,7 +34,7 @@
       }
     </style>
     <paper-progress value="[[_getProgress(currentQuestion, totalQuestions)]]"></paper-progress>
-    <iron-pages activate-event="" attr-for-selected="id" selected="[[page]]">
+    <iron-pages activate-event="" attr-for-selected="id" selected="[[page]]" id="questionsPanel">
       <div id="questions">
         <p>[[question.text]]</p>
         <paper-radio-group selected="[[response]]" on-paper-radio-group-changed="_setResponse">
@@ -141,6 +143,8 @@
         // has completed
 
         console.log('start animation here');
+        this._animateInOut();
+
         Polymer.Async.microTask.run(() => {
           const currentQuestion = this.currentQuestion;
           this.responses = this.responses.map((response, index) => (
@@ -157,6 +161,22 @@
         // final score view.
 
         return currentQuestion < totalQuestions ? 'questions' : 'score';
+      }
+
+      _animateInOut() {
+        let animation = this.$.questionsPanel.animate([
+          {transform: 'translateX(0)', opacity: 1},
+          {transform: 'translateX(100%)', opacity: 0},
+          {transform: 'translateX(-100%)', opacity: 0},
+          {transform: 'translateX(0)', opacity: 1}
+        ], {
+          duration: 300,
+          easing: 'cubic-bezier(0.4, 0, 0.2, 1)',
+          fill: 'both'
+        });
+        animation.onfinish = (e) => {
+          console.log('anim finished');
+        };
       }
     }
 
