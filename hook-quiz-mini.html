@@ -3,11 +3,14 @@
 <link rel="import" href="../paper-button/paper-button.html">
 <link rel="import" href="../paper-progress/paper-progress.html">
 <link rel="import" href="../paper-radio-group/paper-radio-group.html">
+<script src="http://www.gstatic.com/external_hosted/gsap/v1_16_1/TweenMax.min.js"></script>
 
 <dom-module id="hook-quiz-mini">
   <template>
     <style>
       :host {
+        position: relative;
+        overflow: hidden;
         display: block;
       }
 
@@ -29,13 +32,14 @@
         background: navy;
         color: white;
       }
+
     </style>
     <paper-progress value="[[_getProgress(currentQuestion, totalQuestions)]]"></paper-progress>
-    <iron-pages selected="[[currentQuestion]]">
+    <iron-pages selected="[[currentQuestion]]" id="view_question">
       <template is="dom-repeat" items="[[questions]]" as="question">
         <div>
-          <p>[[question.text]]</p>
-          <paper-radio-group selected="[[_getResponse(index, responses)]]" on-paper-radio-group-changed="_setResponse">
+          <p id="question_headline">[[question.text]]</p>
+          <paper-radio-group selected="[[_getResponse(index, responses)]]" on-paper-radio-group-changed="_setResponse" id="question_responses">
             <template is="dom-repeat" items="[[question.choices]]" as="choice">
               <paper-radio-button name="[[choice.text]]">[[choice.text]]</paper-radio-button>
             </template>
@@ -121,10 +125,35 @@
       }
 
       _setResponse(e) {
+
         this.responses = this.responses.map((response, index) => (
           response = (index === e.model.index) ? e.target.selected : response
         ));
-        this.currentQuestion++;
+
+        // animate out
+        TweenMax.to(this.$.view_question, 0.3, {
+          opacity: 0,
+          x: '100%',
+          ease: Power4.easeIn,
+          onComplete: () => {
+            this.currentQuestion++;
+            TweenMax.set(this.$.view_question, {x: '-100%'});
+            TweenMax.set(this.shadowRoot.querySelector('#question_headline'), {opacity: 0, x: 20});
+            TweenMax.set(this.shadowRoot.querySelector('#question_responses'), {opacity: 0, x: 20});
+          }
+        });
+        // animate back in
+        TweenMax.to(this.$.view_question, 0.4, {
+          delay: 0.4,
+          opacity: 1,
+          x: '0%',
+          ease: Back.easeOut,
+          onComplete: () => {
+            TweenMax.to(this.shadowRoot.querySelector('#question_headline'), 0.3, {opacity: 1, x: 0, ease: Power2.easeOut});
+            TweenMax.to(this.shadowRoot.querySelector('#question_responses'), 0.4, {opacity: 1, x: 0, ease: Power4.easeOut});
+          }
+        });
+
       }
     }
 
