@@ -1,4 +1,5 @@
 <link rel="import" href="../polymer/polymer-element.html">
+<link rel="import" href="../polymer/lib/utils/async.html">
 <link rel="import" href="../iron-pages/iron-pages.html">
 <link rel="import" href="../paper-button/paper-button.html">
 <link rel="import" href="../paper-progress/paper-progress.html">
@@ -31,20 +32,18 @@
       }
     </style>
     <paper-progress value="[[_getProgress(currentQuestion, totalQuestions)]]"></paper-progress>
-    <iron-pages selected="[[currentQuestion]]">
-      <template is="dom-repeat" items="[[questions]]" as="question">
-        <div>
-          <p>[[question.text]]</p>
-          <paper-radio-group selected="[[_getResponse(index, responses)]]" on-paper-radio-group-changed="_setResponse">
-            <template is="dom-repeat" items="[[question.choices]]" as="choice">
-              <paper-radio-button name="[[choice.text]]">[[choice.text]]</paper-radio-button>
-            </template>
-          </paper-radio-group>
-        </div>
-      </template>
-      <div>
+    <iron-pages activate-event="" attr-for-selected="id" selected="[[page]]">
+      <div id="questions">
+        <p>[[question.text]]</p>
+        <paper-radio-group selected="[[response]]" on-paper-radio-group-changed="_setResponse">
+          <template is="dom-repeat" items="[[question.choices]]" as="choice">
+            <paper-radio-button name="[[choice.text]]">[[choice.text]]</paper-radio-button>
+          </template>
+        </paper-radio-group>
+      </div>
+      <div id="score">
         <p>You scored [[score]]%!</p>
-        <paper-button raised on-click="_questionsChanged">Reset</paper-button>
+        <paper-button raised on-click="_reset">Reset</paper-button>
       </div>
     </iron-pages>
   </template>
@@ -65,7 +64,7 @@
           questions: {
             type: Array,
             value: () => [],
-            observer: '_questionsChanged'
+            observer: '_reset'
           },
           answers: {
             type: Array,
@@ -83,14 +82,26 @@
             type: Number,
             computed: '_getTotalQuestions(questions)'
           },
+          question: {
+            type: Object,
+            computed: '_getQuestion(questions, currentQuestion)'
+          },
+          response: {
+            type: String,
+            computed: '_getResponse(responses, currentQuestion)'
+          },
           score: {
             type: Number,
             computed: '_getScore(answers, responses, totalQuestions)'
+          },
+          page: {
+            type: String,
+            computed: '_getPage(currentQuestion, totalQuestions)'
           }
         };
       }
 
-      _questionsChanged() {
+      _reset() {
         this.currentQuestion = 0;
         this.responses = this.questions.map(question => null);
       }
@@ -109,8 +120,12 @@
         return currentQuestion / totalQuestions * 100;
       }
 
-      _getResponse(index, responses) {
-        return responses[index];
+      _getQuestion(questions, currentQuestion) {
+        return questions[currentQuestion];
+      }
+
+      _getResponse(responses, currentQuestion) {
+        return responses[currentQuestion];
       }
 
       _getScore(answers, responses, totalQuestions) {
@@ -121,10 +136,27 @@
       }
 
       _setResponse(e) {
-        this.responses = this.responses.map((response, index) => (
-          response = (index === e.model.index) ? e.target.selected : response
-        ));
-        this.currentQuestion++;
+        // TODO create exit and entry animation here to transition between
+        // questions. currentQuestion update should occur after exit animation
+        // has completed
+
+        console.log('start animation here');
+        Polymer.Async.microTask.run(() => {
+          const currentQuestion = this.currentQuestion;
+          this.responses = this.responses.map((response, index) => (
+            response = (index === currentQuestion) ? e.target.selected : response
+          ));
+          this.currentQuestion++;
+          console.log('finish animation here');
+        });
+      }
+
+      _getPage(currentQuestion, totalQuestions) {
+        // TODO create exit and entry animation here to transition between
+        // pages. The only transition is between the questions view and the
+        // final score view.
+
+        return currentQuestion < totalQuestions ? 'questions' : 'score';
       }
     }
 
