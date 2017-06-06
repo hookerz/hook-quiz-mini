@@ -30,14 +30,14 @@
         color: white;
       }
     </style>
-    <paper-progress value="[[_getProgress(currentQuestion, questions)]]"></paper-progress>
+    <paper-progress value="[[_getProgress(currentQuestion, totalQuestions)]]"></paper-progress>
     <iron-pages selected="[[currentQuestion]]">
       <template is="dom-repeat" items="[[questions]]" as="question">
         <div>
           <p>[[question.text]]</p>
-          <paper-radio-group selected="[[_getAnswer(index, answers)]]" on-paper-radio-group-changed="_setAnswer">
+          <paper-radio-group selected="[[_getResponse(index, responses)]]" on-paper-radio-group-changed="_setResponse">
             <template is="dom-repeat" items="[[question.choices]]" as="choice">
-              <paper-radio-button name="[[choice]]">[[choice]]</paper-radio-button>
+              <paper-radio-button name="[[choice.text]]">[[choice.text]]</paper-radio-button>
             </template>
           </paper-radio-group>
         </div>
@@ -67,47 +67,62 @@
             value: () => [],
             observer: '_questionsChanged'
           },
+          answers: {
+            type: Array,
+            computed: '_getAnswers(questions)'
+          },
+          responses: {
+            type: Array,
+            value: () => []
+          },
           currentQuestion: {
             type: Number,
             value: 0
           },
-          answers: {
-            type: Array,
-            value: () => [],
-            observer: '_answersChanged'
+          totalQuestions: {
+            type: Number,
+            computed: '_getTotalQuestions(questions)'
           },
           score: {
             type: Number,
-            value: 0
+            computed: '_getScore(answers, responses, totalQuestions)'
           }
         };
       }
 
       _questionsChanged() {
-        this.answers = this.questions.map(value => '');
         this.currentQuestion = 0;
+        this.responses = this.questions.map(question => null);
       }
 
-      _answersChanged() {
-        const {questions, answers} = this;
-        const correct = answers.reduce((acc, value, index) => (
-          acc + (value === questions[index].answer)
+      _getAnswers(questions) {
+        return this.questions.map(question => (
+          question.choices.filter(choice => choice.correct)[0]
+        ));
+      }
+
+      _getTotalQuestions(questions) {
+        return questions.length;
+      }
+
+      _getProgress(currentQuestion, totalQuestions) {
+        return currentQuestion / totalQuestions * 100;
+      }
+
+      _getResponse(index, responses) {
+        return responses[index];
+      }
+
+      _getScore(answers, responses, totalQuestions) {
+        const correct = responses.reduce((acc, response, index) => (
+          acc + (answers[index] && response === answers[index].text)
         ), 0);
-        const score = Math.round(correct / questions.length * 100);
-        this.score = score;
+        return Math.round(correct / totalQuestions * 100);
       }
 
-      _getProgress(currentQuestion, questions) {
-        return (currentQuestion + 1) / questions.length * 100;
-      }
-
-      _getAnswer(index, answers) {
-        return answers[index];
-      }
-
-      _setAnswer(e) {
-        this.answers = [...this.answers].map((value, index) => (
-          value = (index === e.model.index) ? e.target.selected : value
+      _setResponse(e) {
+        this.responses = this.responses.map((response, index) => (
+          response = (index === e.model.index) ? e.target.selected : response
         ));
         this.currentQuestion++;
       }
