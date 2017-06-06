@@ -36,8 +36,8 @@
     <paper-progress value="[[_getProgress(currentQuestion, totalQuestions)]]"></paper-progress>
     <iron-pages activate-event="" attr-for-selected="id" selected="[[page]]" id="questionsPanel">
       <div id="questions">
-        <p>[[question.text]]</p>
-        <paper-radio-group selected="[[response]]" on-paper-radio-group-changed="_setResponse">
+        <p id="questionText">[[question.text]]</p>
+        <paper-radio-group selected="[[response]]" on-paper-radio-group-changed="_setResponse" id="questionAnswers">
           <template is="dom-repeat" items="[[question.choices]]" as="choice">
             <paper-radio-button name="[[choice.text]]">[[choice.text]]</paper-radio-button>
           </template>
@@ -176,6 +176,8 @@
         enterAnimation.onfinish = (e) => {
           this.currentQuestion++;
           this._enterAnimation();
+          this._revealQuestionAnimation();
+          this._revealAnswersAnimation();
         };
       }
 
@@ -186,6 +188,30 @@
         ], {
           duration: 300,
           easing: 'cubic-bezier(.17,.67,0,1.09)',
+          fill: 'both'
+        });
+      }
+
+      _revealQuestionAnimation() {
+        this.$.questionText.animate([
+          {transform: 'translateY(20px)', opacity: 0},
+          {transform: 'translateY(0)', opacity: 1}
+        ], {
+          delay: 250,
+          duration: 300,
+          easing: 'cubic-bezier(0.4, 0, 0.2, 1)',
+          fill: 'both'
+        });
+      }
+
+      _revealAnswersAnimation() {
+        this.$.questionAnswers.animate([
+          {transform: 'translateY(20px)', opacity: 0},
+          {transform: 'translateY(0)', opacity: 1}
+        ], {
+          delay: 300,
+          duration: 300,
+          easing: 'cubic-bezier(0.4, 0, 0.2, 1)',
           fill: 'both'
         });
       }
