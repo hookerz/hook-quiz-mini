@@ -5,6 +5,7 @@
 <link rel="import" href="../paper-progress/paper-progress.html">
 <link rel="import" href="../paper-radio-group/paper-radio-group.html">
 <link rel="import" href="../web-animations-js/web-animations.min.html">
+<link rel="import" href="./quiz-animation.html">
 
 <dom-module id="hook-quiz-mini">
   <template>
@@ -71,7 +72,7 @@
      * @polymer
      * @demo demo/index.html
      */
-    class HookQuizMini extends Polymer.Element {
+    class HookQuizMini extends AnimationMixin(Polymer.Element) {
       static get is() { return 'hook-quiz-mini'; }
       static get properties() {
         return {
@@ -114,6 +115,10 @@
           }
 
         };
+      }
+
+      connectedCallback() {
+        super.connectedCallback();
       }
 
       ready() {
@@ -162,7 +167,11 @@
           response = (index === currentQuestion) ? e.target.selected : response
         ));
 
-        this._exitAnimation();
+        this.currentQuestionChoices = Array.prototype.slice.call(
+          this.shadowRoot.querySelectorAll('.question-choices')
+        );
+
+        this._hideCurrentQuestionAnimation();
       }
 
       _getPage(currentQuestion, totalQuestions) {
@@ -173,96 +182,6 @@
         }
 
         return currentQuestion < totalQuestions ? 'questions' : 'score';
-      }
-
-      _exitAnimation() {
-        this.$.questionText.animate([
-          {transform: 'translateX(0)', opacity: 1},
-          {transform: 'translateX(100%)', opacity: 0}
-        ], {
-          delay: 500,
-          duration: 600,
-          easing: 'cubic-bezier(0.4, 0, 0.2, 1)',
-          fill: 'both'
-        });
-
-        this.currentQuestionChoices = Array.prototype.slice.call(
-          this.shadowRoot.querySelectorAll('.question-choices')
-        );
-
-        this.currentQuestionChoices.map( (element, index) => {
-          this.exitAnim = element.animate([
-            {transform: 'translateX(0)', opacity: 1},
-            {transform: 'translateX(100%)', opacity: 0}
-          ], {
-            delay: 575 + (index * 100),
-            duration: 300,
-            easing: 'cubic-bezier(0.4, 0, 0.2, 1)',
-            fill: 'both'
-          });
-        });
-
-        this.exitAnim.onfinish = () => {
-          this.currentQuestion++;
-          this.currentQuestionChoices = null;
-
-          this._revealQuestionAnimation();
-          this._revealAnswersAnimation();
-        };
-      }
-
-      _revealQuestionAnimation() {
-        this.$.questionText.animate([
-          {transform: 'translateY(20px)', opacity: 0},
-          {transform: 'translateY(0)', opacity: 1}
-        ], {
-          delay: 250,
-          duration: 300,
-          easing: 'cubic-bezier(0.4, 0, 0.2, 1)',
-          fill: 'both'
-        });
-      }
-
-      _revealAnswersAnimation() {
-
-        this.currentQuestionChoices = Array.prototype.slice.call(
-          this.shadowRoot.querySelectorAll('.question-choices')
-        );
-
-        this.currentQuestionChoices.map( (element, index) => {
-          element.animate([
-            {transform: 'translateY(20px)', opacity: 0},
-            {transform: 'translateY(0)', opacity: 1}
-          ], {
-            delay: 375 + (index * 100),
-            duration: 300,
-            easing: 'cubic-bezier(0.4, 0, 0.2, 1)',
-            fill: 'both'
-          });
-        });
-      }
-
-      _revealScoreAnimation() {
-        this.$.quizScore.animate([
-          {transform: 'translateX(-50px)', opacity: 0},
-          {transform: 'translateX(0)', opacity: 1}
-        ], {
-          duration: 300,
-          easing: 'cubic-bezier(.17,.67,0,1.09)',
-          fill: 'both'
-        });
-      }
-
-      _revealResetBtnAnimation() {
-        this.$.resetBtn.animate([
-          {transform: 'scale(0.45)', opacity: 0},
-          {transform: 'scale(1)', opacity: 1}
-        ], {
-          delay: 450,
-          duration: 300,
-          easing: 'cubic-bezier(0.175, 0.885, 0.32, 1.275)',
-          fill: 'both'
-        });
       }
 
     }
