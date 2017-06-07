@@ -39,7 +39,7 @@
       }
 
     </style>
-    <paper-progress value="[[_getProgress(currentQuestion, totalQuestions)]]"></paper-progress>
+    <paper-progress value="[[_getProgress(currentQuestion, totalQuestions)]]" class="transiting"></paper-progress>
     <iron-pages activate-event="" attr-for-selected="id" selected="[[page]]" id="questionsPanel">
       <div id="questions">
         <p id="questionText">[[question.text]]</p>
