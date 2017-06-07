@@ -100,6 +100,7 @@
             type: String,
             computed: '_getPage(currentQuestion, totalQuestions)'
           }
+
         };
       }
 
@@ -137,22 +138,8 @@
         return Math.round(correct / totalQuestions * 100);
       }
 
-      _setResponse(e) {
-        // TODO create exit and entry animation here to transition between
-        // questions. currentQuestion update should occur after exit animation
-        // has completed
-
-        console.log('start animation here');
+      _setResponse() {
         this._exitAnimation();
-
-        Polymer.Async.microTask.run(() => {
-          const currentQuestion = this.currentQuestion;
-          this.responses = this.responses.map((response, index) => (
-            response = (index === currentQuestion) ? e.target.selected : response
-          ));
-          // this.currentQuestion++;
-          console.log('finish animation here');
-        });
       }
 
       _getPage(currentQuestion, totalQuestions) {
@@ -164,7 +151,7 @@
       }
 
       _exitAnimation() {
-        let enterAnimation = this.$.questionsPanel.animate([
+        let exitAnim = this.$.questionsPanel.animate([
           {transform: 'translateX(0)', opacity: 1},
           {transform: 'translateX(100%)', opacity: 0}
         ], {
@@ -173,8 +160,13 @@
           fill: 'both'
         });
 
-        enterAnimation.onfinish = (e) => {
+        exitAnim.onfinish = (e) => {
+          const currentQuestion = this.currentQuestion;
+          this.responses = this.responses.map((response, index) => (
+            response = (index === currentQuestion) ? e.target.selected : response
+          ));
           this.currentQuestion++;
+
           this._enterAnimation();
           this._revealQuestionAnimation();
           this._revealAnswersAnimation();
