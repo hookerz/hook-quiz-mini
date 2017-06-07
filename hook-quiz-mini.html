@@ -25,16 +25,22 @@
 
       paper-progress {
         width: 100%;
-        transition: all 0.3s ease;
+        --paper-progress-active-color: #ff0050;
+        --paper-progress-transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+        --paper-progress-transition-duration: 0.4s;
       }
 
       paper-radio-group {
+        display: -webkit-flex;
+        display: -ms-flex;
         display: flex;
+        -webkit-flex-direction: column;
         flex-direction: column;
+        --paper-radio-button-checked-color: #ff0050;
       }
 
       paper-button {
-        background: navy;
+        background: #ff0050;
         color: white;
       }
 
