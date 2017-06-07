@@ -30,9 +30,37 @@
         background: navy;
         color: white;
       }
+
+      .enter-animation {
+        animation: fadeIn 1s cubic-bezier(.67, .01, .28, 1);
+      }
+
+      .exit-animation {
+        animation: fadeOut 1s cubic-bezier(.67, .01, .28, 1);
+      }
+
+      @keyframes fadeIn {
+        0% {
+          opacity: 0;
+        }
+
+        100% {
+          opacity: 1;
+        }
+      }
+
+      @keyframes fadeOut {
+        0% {
+          opacity: 1;
+        }
+
+        100% {
+          opacity: 0;
+        }
+      }
     </style>
     <paper-progress value="[[_getProgress(currentQuestion, totalQuestions)]]"></paper-progress>
-    <iron-pages activate-event="" attr-for-selected="id" selected="[[page]]">
+    <iron-pages activate-event="" attr-for-selected="id" selected="[[page]]" id="pages">
       <div id="questions">
         <p>[[question.text]]</p>
         <paper-radio-group selected="[[response]]" on-paper-radio-group-changed="_setResponse">
@@ -140,15 +168,23 @@
         // questions. currentQuestion update should occur after exit animation
         // has completed
 
-        console.log('start animation here');
-        Polymer.Async.microTask.run(() => {
-          const currentQuestion = this.currentQuestion;
-          this.responses = this.responses.map((response, index) => (
-            response = (index === currentQuestion) ? e.target.selected : response
-          ));
-          this.currentQuestion++;
-          console.log('finish animation here');
-        });
+        this.$.pages.classList.remove('enter-animation');
+        this.$.pages.classList.add('exit-animation');
+
+        this.$.pages.addEventListener('animationend', (e) => {
+          Polymer.Async.microTask.run(() => {
+            const currentQuestion = this.currentQuestion;
+            this.responses = this.responses.map((response, index) => (
+              response = (index === currentQuestion) ? e.target.selected : response
+            ));
+            this.currentQuestion++;
+
+            if(e.animationName === 'fadeOut'){
+              this.$.pages.classList.remove('exit-animation');
+              this.$.pages.classList.add('enter-animation');
+            }
+          });
+        }, { once: true });
       }
 
       _getPage(currentQuestion, totalQuestions) {
