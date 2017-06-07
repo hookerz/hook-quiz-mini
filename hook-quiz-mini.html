@@ -138,7 +138,12 @@
         return Math.round(correct / totalQuestions * 100);
       }
 
-      _setResponse() {
+      _setResponse(e) {
+        const currentQuestion = this.currentQuestion;
+        this.responses = this.responses.map((response, index) => (
+          response = (index === currentQuestion) ? e.target.selected : response
+        ));
+
         this._exitAnimation();
       }
 
@@ -160,11 +165,7 @@
           fill: 'both'
         });
 
-        exitAnim.onfinish = (e) => {
-          const currentQuestion = this.currentQuestion;
-          this.responses = this.responses.map((response, index) => (
-            response = (index === currentQuestion) ? e.target.selected : response
-          ));
+        exitAnim.onfinish = () => {
           this.currentQuestion++;
 
           this._enterAnimation();
