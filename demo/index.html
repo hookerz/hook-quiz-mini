@@ -22,35 +22,12 @@
       <h3>Basic hook-quiz-mini demo</h3>
       <demo-snippet>
         <template>
-          <hook-quiz-mini></hook-quiz-mini>
+          <hook-quiz-mini questions='[{"text":"Cat or dog?","choices":[{"text":"Cat","correct":true},{"text":"Dog","correct":false}]},{"text":"Chicken or fish?","choices":[{"text":"Chicken","correct":false},{"text":"Fish","correct":true}]},{"text":"Six or twenty-seven?","choices":[{"text":"Six","correct":true},{"text":"Twenty-seven","correct":false}]}]'>
+          </hook-quiz-mini>
         </template>
       </demo-snippet>
     </div>
-    <script>
-    const el = document.querySelector('hook-quiz-mini');
-    el.questions = [
-      {
-        "text": "Cat or dog?",
-        "choices": [
-          {"text": "Cat", "correct": true},
-          {"text": "Dog", "correct": false}
-        ]
-      },
-      {
-        "text": "Chicken or fish?",
-        "choices": [
-          {"text": "Chicken", "correct": false},
-          {"text": "Fish", "correct": true}
-        ]
-      },
-      {
-        "text": "Six or twenty-seven?",
-        "choices": [
-          {"text": "Six", "correct": true},
-          {"text": "Twenty-seven", "correct": false}
-        ]
-      }
-    ];
-    </script>
+
+
   </body>
 </html>
