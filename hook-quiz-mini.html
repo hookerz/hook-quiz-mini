@@ -4,12 +4,15 @@
 <link rel="import" href="../paper-button/paper-button.html">
 <link rel="import" href="../paper-progress/paper-progress.html">
 <link rel="import" href="../paper-radio-group/paper-radio-group.html">
+<link rel="import" href="../paper-ripple/paper-ripple.html">
 
 <dom-module id="hook-quiz-mini">
   <template>
     <style>
       :host {
         display: block;
+        position: relative;
+        overflow-y: hidden;
       }
 
       p {
@@ -17,8 +20,15 @@
         line-height: 1em;
       }
 
+      paper-ripple {
+        color: rgba(0, 0, 128, .5);
+      }
+
       paper-progress {
         width: 100%;
+        --paper-progress-active-color: navy;
+        --paper-progress-transition-duration: .8s;
+        --paper-progress-transition-timing-functionf: cubic-bezier(.67, .01, .28, 1);
       }
 
       paper-radio-group {
@@ -32,12 +42,36 @@
       }
 
       .enter-animation {
-        animation: fadeIn 1s cubic-bezier(.67, .01, .28, 1);
+        animation: fadeIn .8s cubic-bezier(.67, .01, .28, 1);
       }
 
       .exit-animation {
-        animation: fadeOut 1s cubic-bezier(.67, .01, .28, 1);
+        animation: fadeOut .8s cubic-bezier(.67, .01, .28, 1);
       }
+
+      .enter-animation p {
+        animation: staggerUp .6s cubic-bezier(.67, .01, .28, 1);
+      }
+
+      .exit-animation p {
+        animation: staggerDown .6s cubic-bezier(.67, .01, .28, 1) .2s;
+      }
+
+      .enter-animation .choices {
+        animation: staggerUp .6s cubic-bezier(.67, .01, .28, 1) .2s;
+      }
+
+      .exit-animation .choices {
+        animation: staggerDown .6s cubic-bezier(.67, .01, .28, 1);
+      }
+
+      .enter-animation .reset-button {
+        animation: fadeIn .6s cubic-bezier(.67, .01, .28, 1), staggerUp .6s cubic-bezier(.67, .01, .28, 1) .2s;
+      }
+
+/*      .exit-animation .reset-button {
+        animation: staggerDown .6s cubic-bezier(.67, .01, .28, 1);
+      }*/
 
       @keyframes fadeIn {
         0% {
@@ -58,20 +92,41 @@
           opacity: 0;
         }
       }
+
+      @keyframes staggerUp {
+        0% {
+          transform: translateY(125px);
+        }
+
+        100% {
+          transform: translateY(0);
+        }
+      }
+
+      @keyframes staggerDown {
+        0% {
+          transform: translateY(0);
+        }
+
+        100% {
+          transform: translateY(125px);
+        }
+      }
     </style>
-    <paper-progress value="[[_getProgress(currentQuestion, totalQuestions)]]"></paper-progress>
+    <paper-ripple id="ripple" recenters></paper-ripple>
+    <paper-progress class="transiting" value="[[_getProgress(currentQuestion, totalQuestions)]]"></paper-progress>
     <iron-pages activate-event="" attr-for-selected="id" selected="[[page]]" id="pages">
       <div id="questions">
         <p>[[question.text]]</p>
-        <paper-radio-group selected="[[response]]" on-paper-radio-group-changed="_setResponse">
+        <paper-radio-group class="choices" selected="[[response]]" on-paper-radio-group-changed="_setResponse">
           <template is="dom-repeat" items="[[question.choices]]" as="choice">
-            <paper-radio-button name="[[choice.text]]">[[choice.text]]</paper-radio-button>
+            <paper-radio-button name="[[choice.text]]" noink>[[choice.text]]</paper-radio-button>
           </template>
         </paper-radio-group>
       </div>
       <div id="score">
         <p>You scored [[score]]%!</p>
-        <paper-button raised on-click="_reset">Reset</paper-button>
+        <paper-button raised on-click="_reset" class="reset-button" noink>Reset</paper-button>
       </div>
     </iron-pages>
   </template>
@@ -164,33 +219,40 @@
       }
 
       _setResponse(e) {
-        // TODO create exit and entry animation here to transition between
-        // questions. currentQuestion update should occur after exit animation
-        // has completed
+        this.$.questions.classList.remove('enter-animation');
+        this.$.questions.classList.add('exit-animation');
 
-        this.$.pages.classList.remove('enter-animation');
-        this.$.pages.classList.add('exit-animation');
+        const setAnimations = (e) => {
+          const currentQuestion = this.currentQuestion;
+          this.responses = this.responses.map((response, index) => (
+            response = (index === currentQuestion) ? e.target.selected : response
+          ));
+          this.currentQuestion++;
 
-        this.$.pages.addEventListener('animationend', (e) => {
-          Polymer.Async.microTask.run(() => {
-            const currentQuestion = this.currentQuestion;
-            this.responses = this.responses.map((response, index) => (
-              response = (index === currentQuestion) ? e.target.selected : response
-            ));
-            this.currentQuestion++;
+          this.$.questions.classList.remove('exit-animation');
+          this.$.questions.classList.add('enter-animation');
 
-            if(e.animationName === 'fadeOut'){
-              this.$.pages.classList.remove('exit-animation');
-              this.$.pages.classList.add('enter-animation');
-            }
-          });
-        }, { once: true });
+
+          this.$.questions.removeEventListener('animationend', setAnimations, false);
+        }
+
+        this.$.questions.addEventListener('animationend', setAnimations, false);
       }
 
       _getPage(currentQuestion, totalQuestions) {
-        // TODO create exit and entry animation here to transition between
-        // pages. The only transition is between the questions view and the
-        // final score view.
+        const setAnimations = (e) => {
+          this.$.pages.items.forEach((item) => {
+            if(item.classList.contains('iron-selected')) {
+              item.classList.add('enter-animation');
+            } else {
+              item.classList.remove('enter-animation');
+            }
+          });
+
+          this.$.pages.removeEventListener('iron-select', setAnimations, false);
+        }
+
+        this.$.pages.addEventListener('iron-select', setAnimations, false);
 
         return currentQuestion < totalQuestions ? 'questions' : 'score';
       }
