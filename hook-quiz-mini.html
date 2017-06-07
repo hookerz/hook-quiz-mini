@@ -32,6 +32,7 @@
         background: navy;
         color: white;
       }
+
     </style>
     <paper-progress value="[[_getProgress(currentQuestion, totalQuestions)]]"></paper-progress>
     <iron-pages activate-event="" attr-for-selected="id" selected="[[page]]" id="questionsPanel">
@@ -44,8 +45,8 @@
         </paper-radio-group>
       </div>
       <div id="score">
-        <p>You scored [[score]]%!</p>
-        <paper-button raised on-click="_reset">Reset</paper-button>
+        <p id="quizScore">You scored [[score]]%!</p>
+        <paper-button raised on-click="_reset" id="resetBtn">Reset</paper-button>
       </div>
     </iron-pages>
   </template>
@@ -148,9 +149,11 @@
       }
 
       _getPage(currentQuestion, totalQuestions) {
-        // TODO create exit and entry animation here to transition between
-        // pages. The only transition is between the questions view and the
-        // final score view.
+        // end game - reveal score anim
+        if (currentQuestion === totalQuestions) {
+          this._revealScoreAnimation();
+          this._revealResetBtnAnimation();
+        }
 
         return currentQuestion < totalQuestions ? 'questions' : 'score';
       }
@@ -205,6 +208,29 @@
           delay: 300,
           duration: 300,
           easing: 'cubic-bezier(0.4, 0, 0.2, 1)',
+          fill: 'both'
+        });
+      }
+
+      _revealScoreAnimation() {
+        this.$.quizScore.animate([
+          {transform: 'translateX(20px)', opacity: 0},
+          {transform: 'translateX(0)', opacity: 1}
+        ], {
+          duration: 300,
+          easing: 'cubic-bezier(.17,.67,0,1.09)',
+          fill: 'both'
+        });
+      }
+
+      _revealResetBtnAnimation() {
+        this.$.resetBtn.animate([
+          {transform: 'scale(0.75)', opacity: 0},
+          {transform: 'scale(1)', opacity: 1}
+        ], {
+          delay: 400,
+          duration: 400,
+          easing: 'cubic-bezier(0.175, 0.885, 0.32, 1.275)',
           fill: 'both'
         });
       }
