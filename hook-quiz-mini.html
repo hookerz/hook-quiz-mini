@@ -13,6 +13,9 @@
         display: block;
         position: relative;
         overflow: hidden;
+        padding: 0 25px;
+        -webkit-box-sizing: border-box;
+        box-sizing: border-box;
       }
 
       p {
@@ -22,6 +25,7 @@
 
       paper-progress {
         width: 100%;
+        transition: all 0.3s ease;
       }
 
       paper-radio-group {
@@ -39,9 +43,9 @@
     <iron-pages activate-event="" attr-for-selected="id" selected="[[page]]" id="questionsPanel">
       <div id="questions">
         <p id="questionText">[[question.text]]</p>
-        <paper-radio-group selected="[[response]]" on-paper-radio-group-changed="_setResponse" id="questionAnswers">
+        <paper-radio-group selected="[[response]]" on-paper-radio-group-changed="_setResponse">
           <template is="dom-repeat" items="[[question.choices]]" as="choice">
-            <paper-radio-button name="[[choice.text]]">[[choice.text]]</paper-radio-button>
+            <paper-radio-button name="[[choice.text]]" class="question-choices">[[choice.text]]</paper-radio-button>
           </template>
         </paper-radio-group>
       </div>
@@ -106,6 +110,12 @@
         };
       }
 
+      ready() {
+        super.ready();
+
+        this.currentQuestionChoices;
+      }
+
       _reset() {
         this.currentQuestion = 0;
         this.responses = this.questions.map(question => null);
@@ -160,33 +170,39 @@
       }
 
       _exitAnimation() {
-        let exitAnim = this.$.questionsPanel.animate([
+        this.$.questionText.animate([
           {transform: 'translateX(0)', opacity: 1},
           {transform: 'translateX(100%)', opacity: 0}
         ], {
-          duration: 300,
+          delay: 500,
+          duration: 600,
           easing: 'cubic-bezier(0.4, 0, 0.2, 1)',
           fill: 'both'
         });
 
-        exitAnim.onfinish = () => {
-          this.currentQuestion++;
+        this.currentQuestionChoices = Array.prototype.slice.call(
+          this.shadowRoot.querySelectorAll('.question-choices')
+        );
 
-          this._enterAnimation();
+        this.currentQuestionChoices.map( (element, index) => {
+          this.exitAnim = element.animate([
+            {transform: 'translateX(0)', opacity: 1},
+            {transform: 'translateX(100%)', opacity: 0}
+          ], {
+            delay: 575 + (index * 100),
+            duration: 300,
+            easing: 'cubic-bezier(0.4, 0, 0.2, 1)',
+            fill: 'both'
+          });
+        });
+
+        this.exitAnim.onfinish = () => {
+          this.currentQuestion++;
+          this.currentQuestionChoices = null;
+
           this._revealQuestionAnimation();
           this._revealAnswersAnimation();
         };
-      }
-
-      _enterAnimation() {
-        this.$.questionsPanel.animate([
-          {transform: 'translateX(-100%)', opacity: 0},
-          {transform: 'translateX(0)', opacity: 1}
-        ], {
-          duration: 300,
-          easing: 'cubic-bezier(.17,.67,0,1.09)',
-          fill: 'both'
-        });
       }
 
       _revealQuestionAnimation() {
@@ -202,20 +218,27 @@
       }
 
       _revealAnswersAnimation() {
-        this.$.questionAnswers.animate([
-          {transform: 'translateY(20px)', opacity: 0},
-          {transform: 'translateY(0)', opacity: 1}
-        ], {
-          delay: 300,
-          duration: 300,
-          easing: 'cubic-bezier(0.4, 0, 0.2, 1)',
-          fill: 'both'
+
+        this.currentQuestionChoices = Array.prototype.slice.call(
+          this.shadowRoot.querySelectorAll('.question-choices')
+        );
+
+        this.currentQuestionChoices.map( (element, index) => {
+          element.animate([
+            {transform: 'translateY(20px)', opacity: 0},
+            {transform: 'translateY(0)', opacity: 1}
+          ], {
+            delay: 375 + (index * 100),
+            duration: 300,
+            easing: 'cubic-bezier(0.4, 0, 0.2, 1)',
+            fill: 'both'
+          });
         });
       }
 
       _revealScoreAnimation() {
         this.$.quizScore.animate([
-          {transform: 'translateX(20px)', opacity: 0},
+          {transform: 'translateX(-50px)', opacity: 0},
           {transform: 'translateX(0)', opacity: 1}
         ], {
           duration: 300,
