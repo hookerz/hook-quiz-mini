@@ -4,6 +4,7 @@
 <link rel="import" href="../paper-button/paper-button.html">
 <link rel="import" href="../paper-progress/paper-progress.html">
 <link rel="import" href="../paper-radio-group/paper-radio-group.html">
+<link rel="import" href="../web-animations-js/web-animations.min.html">
 
 <dom-module id="hook-quiz-mini">
   <template>
@@ -225,11 +226,11 @@
 
       _revealResetBtnAnimation() {
         this.$.resetBtn.animate([
-          {transform: 'scale(0.75)', opacity: 0},
+          {transform: 'scale(0.45)', opacity: 0},
           {transform: 'scale(1)', opacity: 1}
         ], {
-          delay: 400,
-          duration: 400,
+          delay: 450,
+          duration: 300,
           easing: 'cubic-bezier(0.175, 0.885, 0.32, 1.275)',
           fill: 'both'
         });
