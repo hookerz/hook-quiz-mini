@@ -123,7 +123,6 @@
 
       ready() {
         super.ready();
-
         this.currentQuestionChoices;
       }
 
@@ -171,7 +170,7 @@
           this.shadowRoot.querySelectorAll('.question-choices')
         );
 
-        this._hideCurrentQuestionAnimation();
+        this._quizTransitionAnimation();
       }
 
       _getPage(currentQuestion, totalQuestions) {

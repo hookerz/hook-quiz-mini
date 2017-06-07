@@ -8,7 +8,7 @@
       super.connectedCallback();
     }
 
-    _hideCurrentQuestionAnimation() {
+    _quizTransitionAnimation() {
       this.$.questionText.animate([
         {transform: 'translateX(0)', opacity: 1},
         {transform: 'translateX(100%)', opacity: 0}
