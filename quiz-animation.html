@@ -4,29 +4,68 @@
 
   const AnimationMixin = superclass => class extends superclass {
 
+    static get properties() {
+      return {
+        exitHorizontal: {
+          type: Array,
+          value: () => [
+            {transform: 'translateX(0)', opacity: 1},
+            {transform: 'translateX(100%)', opacity: 0}
+          ]
+        },
+        enterHorizontal: {
+          type: Array,
+          value: () => [
+            {transform: 'translateX(100%)', opacity: 0},
+            {transform: 'translateX(0)', opacity: 1}
+          ]
+        },
+        exitVertical: {
+          type: Array,
+          value: () => [
+            {transform: 'translateY(0)', opacity: 1},
+            {transform: 'translateY(20px)', opacity: 0}
+          ]
+        },
+        enterVertical: {
+          type: Array,
+          value: () => [
+            {transform: 'translateY(20px)', opacity: 0},
+            {transform: 'translateY(0)', opacity: 1}
+          ]
+        },
+        easePower2: {
+          type: String,
+          value: 'cubic-bezier(0.4, 0, 0.2, 1)'
+        },
+        easeBack: {
+          type: String,
+          value: 'cubic-bezier(0.175, 0.885, 0.32, 1.275)'
+        },
+        baseDuration: {
+          type: Number,
+          value: 300
+        }
+      };
+    }
+
     connectedCallback() {
       super.connectedCallback();
     }
 
     _quizTransitionAnimation() {
-      this.$.questionText.animate([
-        {transform: 'translateX(0)', opacity: 1},
-        {transform: 'translateX(100%)', opacity: 0}
-      ], {
+      this.$.questionText.animate(this.exitHorizontal, {
         delay: 500,
         duration: 600,
-        easing: 'cubic-bezier(0.4, 0, 0.2, 1)',
+        easing: this.easePower2,
         fill: 'both'
       });
 
       this.currentQuestionChoices.map( (element, index) => {
-        this.exitAnim = element.animate([
-          {transform: 'translateX(0)', opacity: 1},
-          {transform: 'translateX(100%)', opacity: 0}
-        ], {
+        this.exitAnim = element.animate(this.exitHorizontal, {
           delay: 575 + (index * 100),
-          duration: 300,
-          easing: 'cubic-bezier(0.4, 0, 0.2, 1)',
+          duration: this.baseDuration,
+          easing: this.easePower2,
           fill: 'both'
         });
       });
@@ -41,13 +80,10 @@
     }
 
     _revealQuestionAnimation() {
-      this.$.questionText.animate([
-        {transform: 'translateY(20px)', opacity: 0},
-        {transform: 'translateY(0)', opacity: 1}
-      ], {
+      this.$.questionText.animate(this.enterVertical, {
         delay: 250,
-        duration: 300,
-        easing: 'cubic-bezier(0.4, 0, 0.2, 1)',
+        duration: this.baseDuration,
+        easing: this.easePower2,
         fill: 'both'
       });
     }
@@ -59,13 +95,10 @@
       );
 
       this.currentQuestionChoices.map( (element, index) => {
-        element.animate([
-          {transform: 'translateY(20px)', opacity: 0},
-          {transform: 'translateY(0)', opacity: 1}
-        ], {
+        element.animate(this.enterVertical, {
           delay: 375 + (index * 100),
-          duration: 300,
-          easing: 'cubic-bezier(0.4, 0, 0.2, 1)',
+          duration: this.baseDuration,
+          easing: this.easePower2,
           fill: 'both'
         });
       });
@@ -76,7 +109,7 @@
         {transform: 'translateX(-50px)', opacity: 0},
         {transform: 'translateX(0)', opacity: 1}
       ], {
-        duration: 300,
+        duration: this.baseDuration,
         easing: 'cubic-bezier(.17,.67,0,1.09)',
         fill: 'both'
       });
@@ -88,8 +121,8 @@
         {transform: 'scale(1)', opacity: 1}
       ], {
         delay: 450,
-        duration: 300,
-        easing: 'cubic-bezier(0.175, 0.885, 0.32, 1.275)',
+        duration: this.baseDuration,
+        easing: this.easeBack,
         fill: 'both'
       });
     }
