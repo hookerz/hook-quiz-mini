@@ -10,27 +10,32 @@ Install the `hook-quiz-mini` element using [Bower](https://bower.io/):
 
 `bower install https://github.com/hookerz/hook-quiz-mini`
 
-Include the `hook-quiz-mini` element in your project:
+Import the `hook-quiz-mini` element into your project.
+
+**Note**: For full browser compatibility, also add the [Web Animations polyfill](https://cdnjs.com/libraries/web-animations):
 
 Example:
 
 ```
 <link rel="import" href="path/to/hook-quiz-mini.html">
 
-...
-
-<hook-quiz-mini></hook-quiz-mini>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/web-animations/2.2.5/web-animations.min.js"></script>
 ```
-
-Select the quiz element:
+Include the `hook-quiz-mini` element in your project. Wrap the quiz element in `dom-bind` and `template` tags. On the quiz element, add a `questions` attribute.
 
 Example:
 
 ```
-const el = document.querySelector('hook-quiz-mini');
+<dom-bind>
+  <template>
+  <hook-quiz-mini questions="[[questions]]"></hook-quiz-mini>
+  </template>
+</dom-bind>
 ```
 
-Create a `questions` property on the quiz element populated with an array of question objects. 
+Select the `dom-bind` element.
+
+Create a `questions` property on the `dom-bind` element populated with an array of question objects. 
 
 Each question object should contain a `text` property and a `choices` property. 
 
@@ -39,22 +44,24 @@ The `choices` property should contain an array of objects specifying the choice 
 Example:
 
 ```
-el.questions = [
+var domBind = document.querySelector('dom-bind');
+
+domBind.questions = [
   {
-      "text": "Cat or dog?",
-        "choices": [
-          {"text": "Cat", "correct": true},
-            {"text": "Dog", "correct": false}
-        ]
-    },
-    {
-        "text": "Chicken or fish?",
-        "choices": [
-            {"text": "Chicken", "correct": false},
-            {"text": "Fish", "correct": true}
-        ]
-     },
-    ...
+    "text": "Cat or dog?",
+    "choices": [
+      {"text": "Cat", "correct": true},
+      {"text": "Dog", "correct": false}
+    ]
+  },
+  {
+    "text": "Chicken or fish?",
+    "choices": [
+      {"text": "Chicken", "correct": false},
+      {"text": "Fish", "correct": true}
+    ]
+  },
+  ...
 ];
 
 ```
