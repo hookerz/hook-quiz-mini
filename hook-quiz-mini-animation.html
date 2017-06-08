@@ -75,23 +75,23 @@
         fill: 'both'
       });
 
-      this._getCurrentQuestionChoices();
-
       // loop through questions
       // to stagger animations
-      this.currentQuestionChoices.map( (element, index) => {
-        this.exitAnim = element.animate(this.keyframes.exitHorizontal, {
+      const staggeredAnimations = this._currentQuestionChoices.map( (element, index) => {
+        return element.animate(this.keyframes.exitHorizontal, {
           delay: 575 + (index * 100),
           duration: this.baseDuration,
           easing: this.easing.easeMaterial,
           fill: 'both'
         });
+
       });
 
+      const lastAnimation = staggeredAnimations[staggeredAnimations.length - 1];
+
       // sets up and reveals next question
-      this.exitAnim.onfinish = () => {
+      lastAnimation.onfinish = () => {
         this.currentQuestion++;
-        this.currentQuestionChoices = null;
 
         this._revealQuestionAnimation();
         this._revealAnswersAnimation();
@@ -115,9 +115,7 @@
      */
     _revealAnswersAnimation() {
 
-      this._getCurrentQuestionChoices();
-
-      this.currentQuestionChoices.map( (element, index) => {
+      this._currentQuestionChoices.map( (element, index) => {
         element.animate(this.keyframes.enterVertical, {
           delay: 375 + (index * 100),
           duration: this.baseDuration,
@@ -153,12 +151,11 @@
     /**
      * gets current question choices to animate
      */
-    _getCurrentQuestionChoices() {
-      this.currentQuestionChoices = Array.prototype.slice.call(
+    get _currentQuestionChoices() {
+      return Array.prototype.slice.call(
         this.shadowRoot.querySelectorAll('.question-choices')
       );
     }
-
   };
 
 </script>
