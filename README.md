@@ -1,20 +1,18 @@
-# \<hook-quiz-mini\>
+[*Demo*](https://hookerz.github.io/hook-quiz-mini/)
+
+## \<hook-quiz-mini\>
 
 
-`<hook-quiz-mini>` is a mini quiz element built with Polymer 2.0. The component features transitions and animations powered by the Web Animations API.
+`hook-quiz-mini` is a quiz element built with Polymer 2.0. The component features transitions and animations powered by the Web Animations API.
 
-## Demo
 
-[https://hookerz.github.io/hook-quiz-mini/](https://hookerz.github.io/hook-quiz-mini/)
-
-## Installation
+Install the `hook-quiz-mini` element using [Bower](https://bower.io/):
 
 `bower install https://github.com/hookerz/hook-quiz-mini`
 
+Include the `hook-quiz-mini` element in your project:
 
-## Usage
-
-Include the quiz element in your webpage.
+Example:
 
 ```
 <link rel="import" href="path/to/hook-quiz-mini.html">
@@ -24,32 +22,36 @@ Include the quiz element in your webpage.
 <hook-quiz-mini></hook-quiz-mini>
 ```
 
-Select the quiz element.
+Select the quiz element:
+
+Example:
 
 ```
 const el = document.querySelector('hook-quiz-mini');
 ```
 
-To populate the quiz, create a `questions` property on the quiz element and create an array of question objects. 
+Create a `questions` property on the quiz element populated with an array of question objects. 
 
 Each question object should contain a `text` property and a `choices` property. 
 
-The `choices` property should contain an array of objects specifying the choice `text` and a `correct` property indicating the right answer to the question.
+The `choices` property should contain an array of objects specifying the choice `text` and a `correct` property indicating the right answer:
+
+Example:
 
 ```
 el.questions = [
-	{
-    	"text": "Cat or dog?",
+  {
+      "text": "Cat or dog?",
         "choices": [
-        	{"text": "Cat", "correct": true},
+          {"text": "Cat", "correct": true},
             {"text": "Dog", "correct": false}
         ]
     },
     {
         "text": "Chicken or fish?",
         "choices": [
-          {"text": "Chicken", "correct": false},
-          {"text": "Fish", "correct": true}
+            {"text": "Chicken", "correct": false},
+            {"text": "Fish", "correct": true}
         ]
      },
     ...
@@ -57,58 +59,16 @@ el.questions = [
 
 ```
 
-### Options
+### Styling
 
-You can customize the llook of the quiz by editing the color values in corresponding mixin properties:
+The following custom properties and mixins are available for styling in `hook-quiz-mini.html`:
 
-**progress bar color**  
-Can be any color format
-
-Example:  
-```
-:host {
-	--hook-quiz-progress-bar-color: #ff0050;
-}
-```
-
-**ripple color**  
-Can be any color format
-
-Example:  
-```
-:host {
-	--hook-quiz-ripple-color: rgba(255, 0, 80, .5);
-}
-```
-
-**radio button color**  
-Can be any color format
-
-Example:  
-```
-:host {
-	--hook-quiz-choice-checked-color: #ff0050;
-}
-```
-
-**reset button color**  
-Can be any color format
-
-Example:  
-```
-:host {
-	--hook-quiz-button-color: #ff0050;
-}
-```
-
-**reset button text color**  
-Can be any color format
-
-Example:  
-```
-:host {
-	--hook-quiz-button-text-color: #fff;
-}
-```
+| Custom property                    | Description                           | Default                  |
+| ---------------------------------- |-------------------------------------| :------------------------- |
+| `--hook-quiz-progress-bar-color`   | The hook-quiz-mini progress bar color | `#ff0050`                |
+| `--hook-quiz-ripple-color`         | The hook-quiz-mini ripple color       | `rgba(255, 0, 80, .5)`   |
+| `--hook-quiz-choice-checked-color` | The hook-quiz-mini radio button color | `#ff0050`                |
+| `--hook-quiz-button-color`         | The hook-quiz-mini button color       | `#ff0050`                |
+| `--hook-quiz-button-text-color`    | The hook-quiz-mini button text color  | `#fff`                   |
 
 
