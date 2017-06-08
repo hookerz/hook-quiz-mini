@@ -129,39 +129,73 @@ Custom property | Description | Default
       static get is() { return 'hook-quiz-mini'; }
       static get properties() {
         return {
+          /**
+          * @prop {Array} quiz questions
+          */
           questions: {
             type: Array,
             value: () => [],
             observer: '_reset'
           },
+          /**
+          * @prop {Array} quiz question choices
+          */
           answers: {
             type: Array,
             computed: '_getAnswers(questions)'
           },
+          /**
+          * @prop {Array} quiz question answers
+          */
           responses: {
             type: Array,
             value: () => []
           },
+          /**
+          * @prop {Number} index of current question
+          */
           currentQuestion: {
             type: Number,
             value: 0
           },
+          /**
+          * @prop {Array} current question chices
+          */
+          currentQuestionChoices: {
+            type: Array,
+            value: () => []
+          },
+          /**
+          * @prop {Number} length of total questions
+          */
           totalQuestions: {
             type: Number,
             computed: '_getTotalQuestions(questions)'
           },
+          /**
+          * @prop {Object} quiz question data
+          */
           question: {
             type: Object,
             computed: '_getQuestion(questions, currentQuestion)'
           },
+          /**
+          * @prop {String} current question answer
+          */
           response: {
             type: String,
             computed: '_getResponse(responses, currentQuestion)'
           },
+          /**
+          * @prop {Number} quiz score
+          */
           score: {
             type: Number,
             computed: '_getScore(answers, responses, totalQuestions)'
           },
+          /**
+          * @prop {String} quiz or results view
+          */
           page: {
             type: String,
             computed: '_getPage(currentQuestion, totalQuestions)'
@@ -170,42 +204,65 @@ Custom property | Description | Default
         };
       }
 
-      connectedCallback() {
-        super.connectedCallback();
-      }
-
-      ready() {
-        super.ready();
-        this.currentQuestionChoices;
-      }
-
+      /**
+      * resets quiz
+      */
       _reset() {
         this.currentQuestion = 0;
         this.responses = this.questions.map(question => null);
       }
 
+      /**
+      * gets correct answer
+      * @param {questions} Array quiz questions
+      */
       _getAnswers(questions) {
         return this.questions.map(question => (
           question.choices.filter(choice => choice.correct)[0]
         ));
       }
 
+      /**
+      * returns length of quiz questions
+      * @param {questions} Array quiz questions
+      */
       _getTotalQuestions(questions) {
         return questions.length;
       }
 
+      /**
+      * returns progress value for paper progress bar
+      * @param {currentQuestion} Number index of current question
+      * @param {totalQuestions} Number length of quiz questions
+      */
       _getProgress(currentQuestion, totalQuestions) {
         return currentQuestion / totalQuestions * 100;
       }
 
+      /**
+      * returns current question data
+      * @param {questions} Array quiz questions
+      * @param {currentQuestion} Number index of current question
+      */
       _getQuestion(questions, currentQuestion) {
         return questions[currentQuestion];
       }
 
+      /**
+      * returns current question choice
+      * @param {responses} Array quiz question responses
+      * @param {currentQuestion} Number index of current question
+      */
       _getResponse(responses, currentQuestion) {
         return responses[currentQuestion];
       }
 
+      /**
+      * returns score
+      * @param {answers} Array quiz question choices
+      * @param {responses} Array quiz question responses
+      * @param {totalQuestions} Number length of quiz questions
+      */
       _getScore(answers, responses, totalQuestions) {
         const correct = responses.reduce((acc, response, index) => (
           acc + (answers[index] && response === answers[index].text)
@@ -213,21 +270,27 @@ Custom property | Description | Default
         return Math.round(correct / totalQuestions * 100);
       }
 
+      /**
+      * sets current question choice/answer
+      * @param {e} event target
+      */
       _setResponse(e) {
         const currentQuestion = this.currentQuestion;
         this.responses = this.responses.map((response, index) => (
           response = (index === currentQuestion) ? e.target.selected : response
         ));
 
-        this.currentQuestionChoices = Array.prototype.slice.call(
-          this.shadowRoot.querySelectorAll('.question-choices')
-        );
-
+        // next question animation
         this._quizTransitionAnimation();
       }
 
+      /**
+      * indicates qestion or score view
+      * @param {currentQuestion} Number index of current question
+      * @param {totalQuestions} Number length of quiz questions
+      */
       _getPage(currentQuestion, totalQuestions) {
-        // end game - reveal score anim
+        // end game reveal score anim
         if (currentQuestion === totalQuestions) {
           this._revealScoreAnimation();
           this._revealResetBtnAnimation();

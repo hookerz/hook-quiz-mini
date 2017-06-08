@@ -6,6 +6,9 @@
 
     static get properties() {
       return {
+        /**
+        * @prop {Array} keyframes - right to left animation
+        */
         exitHorizontal: {
           type: Array,
           value: () => [
@@ -13,6 +16,9 @@
             {transform: 'translateX(100%)', opacity: 0}
           ]
         },
+        /**
+        * @prop {Array} keyframes - left to right animation
+        */
         enterHorizontal: {
           type: Array,
           value: () => [
@@ -20,6 +26,9 @@
             {transform: 'translateX(0)', opacity: 1}
           ]
         },
+        /**
+        * @prop {Array} keyframes - top to bottom animation
+        */
         exitVertical: {
           type: Array,
           value: () => [
@@ -27,6 +36,9 @@
             {transform: 'translateY(20px)', opacity: 0}
           ]
         },
+        /**
+        * @prop {Array} keyframes - bottom to top animation
+        */
         enterVertical: {
           type: Array,
           value: () => [
@@ -34,14 +46,33 @@
             {transform: 'translateY(0)', opacity: 1}
           ]
         },
+        /**
+        * @prop {Array} keyframes - reveal score animation
+        */
+        revealScore: {
+          type: Array,
+          value: () => [
+            {transform: 'translateX(-50px)', opacity: 0},
+            {transform: 'translateX(0)', opacity: 1}
+          ]
+        },
+        /**
+        * @prop {String} cubic bezier value
+        */
         easePower2: {
           type: String,
           value: 'cubic-bezier(0.4, 0, 0.2, 1)'
         },
+        /**
+        * @prop {String} cubic bezier value
+        */
         easeBack: {
           type: String,
           value: 'cubic-bezier(0.175, 0.885, 0.32, 1.275)'
         },
+        /**
+        * @prop {Number} general animation duration value
+        */
         baseDuration: {
           type: Number,
           value: 300
@@ -49,10 +80,9 @@
       };
     }
 
-    connectedCallback() {
-      super.connectedCallback();
-    }
-
+    /**
+    * fires when a choice is made
+    */
     _quizTransitionAnimation() {
       this.$.questionText.animate(this.exitHorizontal, {
         delay: 500,
@@ -61,6 +91,10 @@
         fill: 'both'
       });
 
+      this._getCurrentQuestionChoices();
+
+      // loop through questions
+      // to stagger animations
       this.currentQuestionChoices.map( (element, index) => {
         this.exitAnim = element.animate(this.exitHorizontal, {
           delay: 575 + (index * 100),
@@ -70,6 +104,7 @@
         });
       });
 
+      // sets up and reveals next question
       this.exitAnim.onfinish = () => {
         this.currentQuestion++;
         this.currentQuestionChoices = null;
@@ -79,6 +114,9 @@
       };
     }
 
+    /**
+    * animation to reveal main question text
+    */
     _revealQuestionAnimation() {
       this.$.questionText.animate(this.enterVertical, {
         delay: 250,
@@ -88,11 +126,12 @@
       });
     }
 
+    /**
+    * animation to reveal quesiont choices
+    */
     _revealAnswersAnimation() {
 
-      this.currentQuestionChoices = Array.prototype.slice.call(
-        this.shadowRoot.querySelectorAll('.question-choices')
-      );
+      this._getCurrentQuestionChoices();
 
       this.currentQuestionChoices.map( (element, index) => {
         element.animate(this.enterVertical, {
@@ -104,17 +143,20 @@
       });
     }
 
+    /**
+    * animation to reveal final score text
+    */
     _revealScoreAnimation() {
-      this.$.quizScore.animate([
-        {transform: 'translateX(-50px)', opacity: 0},
-        {transform: 'translateX(0)', opacity: 1}
-      ], {
+      this.$.quizScore.animate(this.revealScore, {
         duration: this.baseDuration,
         easing: this.easeBack,
         fill: 'both'
       });
     }
 
+    /**
+    * animation to reveal Reset btn
+    */
     _revealResetBtnAnimation() {
       this.$.resetBtn.animate([
         {transform: 'scale(0.45)', opacity: 0},
@@ -125,6 +167,15 @@
         easing: this.easeBack,
         fill: 'both'
       });
+    }
+
+    /**
+    * gets current question choices to animate
+    */
+    _getCurrentQuestionChoices() {
+      this.currentQuestionChoices = Array.prototype.slice.call(
+        this.shadowRoot.querySelectorAll('.question-choices')
+      );
     }
 
   };
