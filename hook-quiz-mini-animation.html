@@ -7,76 +7,60 @@
     static get properties() {
       return {
         /**
-        * @prop {Array} keyframes - right to left animation
-        */
-        exitHorizontal: {
-          type: Array,
-          value: () => [
-            {transform: 'translateX(0)', opacity: 1},
-            {transform: 'translateX(100%)', opacity: 0}
-          ]
-        },
-        /**
-        * @prop {Array} keyframes - left to right animation
-        */
-        enterHorizontal: {
-          type: Array,
-          value: () => [
-            {transform: 'translateX(100%)', opacity: 0},
-            {transform: 'translateX(0)', opacity: 1}
-          ]
-        },
-        /**
-        * @prop {Array} keyframes - top to bottom animation
-        */
-        exitVertical: {
-          type: Array,
-          value: () => [
-            {transform: 'translateY(0)', opacity: 1},
-            {transform: 'translateY(20px)', opacity: 0}
-          ]
-        },
-        /**
-        * @prop {Array} keyframes - bottom to top animation
-        */
-        enterVertical: {
-          type: Array,
-          value: () => [
-            {transform: 'translateY(20px)', opacity: 0},
-            {transform: 'translateY(0)', opacity: 1}
-          ]
-        },
-        /**
-        * @prop {Array} keyframes - reveal score animation
-        */
-        revealScore: {
-          type: Array,
-          value: () => [
-            {transform: 'translateX(-50px)', opacity: 0},
-            {transform: 'translateX(0)', opacity: 1}
-          ]
-        },
-        /**
-        * @prop {String} cubic bezier value
-        */
-        easePower2: {
-          type: String,
-          value: 'cubic-bezier(0.4, 0, 0.2, 1)'
-        },
-        /**
-        * @prop {String} cubic bezier value
-        */
-        easeBack: {
-          type: String,
-          value: 'cubic-bezier(0.175, 0.885, 0.32, 1.275)'
-        },
-        /**
         * @prop {Number} general animation duration value
         */
         baseDuration: {
           type: Number,
           value: 300
+        },
+        /**
+        * @prop {Object} keyframes
+        */
+        keyframes: {
+          type: Object,
+          value: () => {
+            return {
+              exitHorizontal: [
+                {transform: 'translateX(0)', opacity: 1},
+                {transform: 'translateX(100%)', opacity: 0}
+              ],
+              enterHorizontal: [
+                {transform: 'translateX(100%)', opacity: 0},
+                {transform: 'translateX(0)', opacity: 1}
+              ],
+              exitVertical: [
+                {transform: 'translateY(0)', opacity: 1},
+                {transform: 'translateY(20px)', opacity: 0}
+              ],
+              enterVertical: [
+                {transform: 'translateY(20px)', opacity: 0},
+                {transform: 'translateY(0)', opacity: 1}
+              ],
+              revealScore: [
+                {transform: 'translateX(-50px)', opacity: 0},
+                {transform: 'translateX(0)', opacity: 1}
+              ],
+              revealResetBtn: [
+                {transform: 'scale(0.45)', opacity: 0},
+                {transform: 'scale(1)', opacity: 1}
+              ]
+            }
+          }
+        },
+        /**
+        * @prop {Object} easing cubic-bezier values
+        */
+        easing: {
+          type: Object,
+          value: () => {
+            return {
+              easeMaterial: 'cubic-bezier(0.4, 0, 0.2, 1)',
+              easeExpo: 'cubic-bezier(0.19, 1, 0.22, 1)',
+              easeBack: 'cubic-bezier(0.175, 0.885, 0.32, 1.275)'
+            }
+          }
         }
+
       };
     }
 
@@ -84,10 +68,10 @@
      * fires when a choice is made
      */
     _quizTransitionAnimation() {
-      this.$.questionText.animate(this.exitHorizontal, {
+      this.$.questionText.animate(this.keyframes.exitHorizontal, {
         delay: 500,
         duration: 600,
-        easing: this.easePower2,
+        easing: this.easing.easeMaterial,
         fill: 'both'
       });
 
@@ -96,10 +80,10 @@
       // loop through questions
       // to stagger animations
       this.currentQuestionChoices.map( (element, index) => {
-        this.exitAnim = element.animate(this.exitHorizontal, {
+        this.exitAnim = element.animate(this.keyframes.exitHorizontal, {
           delay: 575 + (index * 100),
           duration: this.baseDuration,
-          easing: this.easePower2,
+          easing: this.easing.easeMaterial,
           fill: 'both'
         });
       });
@@ -118,10 +102,10 @@
      * animation to reveal main question text
      */
     _revealQuestionAnimation() {
-      this.$.questionText.animate(this.enterVertical, {
+      this.$.questionText.animate(this.keyframes.enterVertical, {
         delay: 250,
         duration: this.baseDuration,
-        easing: this.easePower2,
+        easing: this.easing.easeMaterial,
         fill: 'both'
       });
     }
@@ -134,10 +118,10 @@
       this._getCurrentQuestionChoices();
 
       this.currentQuestionChoices.map( (element, index) => {
-        element.animate(this.enterVertical, {
+        element.animate(this.keyframes.enterVertical, {
           delay: 375 + (index * 100),
           duration: this.baseDuration,
-          easing: this.easePower2,
+          easing: this.easing.easeMaterial,
           fill: 'both'
         });
       });
@@ -147,9 +131,9 @@
      * animation to reveal final score text
      */
     _revealScoreAnimation() {
-      this.$.quizScore.animate(this.revealScore, {
+      this.$.quizScore.animate(this.keyframes.revealScore, {
         duration: this.baseDuration,
-        easing: this.easeBack,
+        easing: this.easing.easeExpo,
         fill: 'both'
       });
     }
@@ -158,13 +142,10 @@
      * animation to reveal Reset btn
      */
     _revealResetBtnAnimation() {
-      this.$.resetBtn.animate([
-        {transform: 'scale(0.45)', opacity: 0},
-        {transform: 'scale(1)', opacity: 1}
-      ], {
+      this.$.resetBtn.animate(this.keyframes.revealResetBtn, {
         delay: 450,
         duration: this.baseDuration,
-        easing: this.easeBack,
+        easing: this.easing.easeBack,
         fill: 'both'
       });
     }
