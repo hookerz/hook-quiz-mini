@@ -5,7 +5,6 @@
 <link rel="import" href="../paper-progress/paper-progress.html">
 <link rel="import" href="../paper-ripple/paper-ripple.html">
 <link rel="import" href="../paper-radio-group/paper-radio-group.html">
-<link rel="import" href="../web-animations-js/web-animations.min.html">
 <link rel="import" href="./hook-quiz-mini-animation.html">
 
 <!--
@@ -88,8 +87,11 @@ Custom property | Description | Default
         display: flex;
         -webkit-flex-direction: column;
         flex-direction: column;
-        --paper-radio-button-checked-color: var(--hook-quiz-choice-checked-color);
         @apply(--hook-quiz-choices-container);
+      }
+
+      paper-radio-button {
+        --paper-radio-button-checked-color: var(--hook-quiz-choice-checked-color);
       }
 
       paper-button {
