@@ -6,7 +6,7 @@
 <link rel="import" href="../paper-ripple/paper-ripple.html">
 <link rel="import" href="../paper-radio-group/paper-radio-group.html">
 <link rel="import" href="../web-animations-js/web-animations.min.html">
-<link rel="import" href="./quiz-animation.html">
+<link rel="import" href="./hook-quiz-mini-animation.html">
 
 <!--
 `<hook-quiz-mini>` is a custom quiz element. Add custom questions and answers, define the right answers and `<hook-quiz-mini>` tallies and displays the score along with a `Reset` button.
@@ -205,17 +205,17 @@ Custom property | Description | Default
       }
 
       /**
-      * resets quiz
-      */
+       * resets quiz
+       */
       _reset() {
         this.currentQuestion = 0;
         this.responses = this.questions.map(question => null);
       }
 
       /**
-      * gets correct answer
-      * @param {questions} Array quiz questions
-      */
+       * gets correct answer
+       * @param {questions} Array quiz questions
+       */
       _getAnswers(questions) {
         return this.questions.map(question => (
           question.choices.filter(choice => choice.correct)[0]
@@ -223,46 +223,46 @@ Custom property | Description | Default
       }
 
       /**
-      * returns length of quiz questions
-      * @param {questions} Array quiz questions
-      */
+       * returns length of quiz questions
+       * @param {questions} Array quiz questions
+       */
       _getTotalQuestions(questions) {
         return questions.length;
       }
 
       /**
-      * returns progress value for paper progress bar
-      * @param {currentQuestion} Number index of current question
-      * @param {totalQuestions} Number length of quiz questions
-      */
+       * returns progress value for paper progress bar
+       * @param {currentQuestion} Number index of current question
+       * @param {totalQuestions} Number length of quiz questions
+       */
       _getProgress(currentQuestion, totalQuestions) {
         return currentQuestion / totalQuestions * 100;
       }
 
       /**
-      * returns current question data
-      * @param {questions} Array quiz questions
-      * @param {currentQuestion} Number index of current question
-      */
+       * returns current question data
+       * @param {questions} Array quiz questions
+       * @param {currentQuestion} Number index of current question
+       */
       _getQuestion(questions, currentQuestion) {
         return questions[currentQuestion];
       }
 
       /**
-      * returns current question choice
-      * @param {responses} Array quiz question responses
-      * @param {currentQuestion} Number index of current question
-      */
+       * returns current question choice
+       * @param {responses} Array quiz question responses
+       * @param {currentQuestion} Number index of current question
+       */
       _getResponse(responses, currentQuestion) {
         return responses[currentQuestion];
       }
 
       /**
-      * returns score
-      * @param {answers} Array quiz question choices
-      * @param {responses} Array quiz question responses
-      * @param {totalQuestions} Number length of quiz questions
-      */
+       * returns score
+       * @param {answers} Array quiz question choices
+       * @param {responses} Array quiz question responses
+       * @param {totalQuestions} Number length of quiz questions
+       */
       _getScore(answers, responses, totalQuestions) {
         const correct = responses.reduce((acc, response, index) => (
           acc + (answers[index] && response === answers[index].text)
@@ -271,9 +271,9 @@ Custom property | Description | Default
       }
 
       /**
-      * sets current question choice/answer
-      * @param {e} event target
-      */
+       * sets current question choice/answer
+       * @param {e} event target
+       */
       _setResponse(e) {
         const currentQuestion = this.currentQuestion;
         this.responses = this.responses.map((response, index) => (
@@ -285,10 +285,10 @@ Custom property | Description | Default
       }
 
       /**
-      * indicates qestion or score view
-      * @param {currentQuestion} Number index of current question
-      * @param {totalQuestions} Number length of quiz questions
-      */
+       * indicates qestion or score view
+       * @param {currentQuestion} Number index of current question
+       * @param {totalQuestions} Number length of quiz questions
+       */
       _getPage(currentQuestion, totalQuestions) {
         // end game reveal score anim
         if (currentQuestion === totalQuestions) {
