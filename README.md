@@ -71,7 +71,7 @@ domBind.questions = [
 The following custom properties and mixins are available for styling in `hook-quiz-mini.html`:
 
 | Custom property                    | Description                           | Default                  |
-| ---------------------------------- |-------------------------------------| :------------------------- |
+| ---------------------------------- | ------------------------------------- | ------------------------ |
 | `--hook-quiz-progress-bar-color`   | The hook-quiz-mini progress bar color | `#ff0050`                |
 | `--hook-quiz-ripple-color`         | The hook-quiz-mini ripple color       | `rgba(255, 0, 80, .5)`   |
 | `--hook-quiz-choice-checked-color` | The hook-quiz-mini radio button color | `#ff0050`                |
