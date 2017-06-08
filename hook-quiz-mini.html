@@ -87,8 +87,11 @@ Custom property | Description | Default
         display: flex;
         -webkit-flex-direction: column;
         flex-direction: column;
-        --paper-radio-button-checked-color: var(--hook-quiz-choice-checked-color);
         @apply(--hook-quiz-choices-container);
+      }
+
+      paper-radio-button {
+        --paper-radio-button-checked-color: var(--hook-quiz-choice-checked-color);
       }
 
       paper-button {
