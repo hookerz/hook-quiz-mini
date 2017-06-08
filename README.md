@@ -12,7 +12,6 @@ Install the `hook-quiz-mini` element using [Bower](https://bower.io/):
 ```sh
 bower install --save https://github.com/hookerz/hook-quiz-mini
 ```
-### Example
 
 **Note**: For full browser compatibility, also add the [Web Animations polyfill](https://cdnjs.com/libraries/web-animations):
 
@@ -20,7 +19,7 @@ bower install --save https://github.com/hookerz/hook-quiz-mini
 <script src="https://cdnjs.cloudflare.com/ajax/libs/web-animations/2.2.5/web-animations.min.js"></script>
 ```
 
-Example:
+### Example
 
 <!-- 
 ```
@@ -82,13 +81,13 @@ The following custom properties and mixins are available for styling in `hook-qu
 
 | Attribute name        | Description                        | Type     | Default          |
 | --------------------- | ---------------------------------- | :------: | ---------------- |
-| questions             | Questions to be asked in the quiz  | Array    | []               |
+| `questions`           | Questions to be asked in the quiz  | Array    | []               |
 
 
 ### Methods
 
 | Method name              | Description                        | 
-| ------------------------ | ---------------------------------- |
+| :----------------------- | ---------------------------------- |
 | getNextQuestion()        | Gets the next quiz question        |  
 | getPreviousQuestion()    | Gets the previous quiz question    |
 | getResponses()           | Gets the responses                 |
