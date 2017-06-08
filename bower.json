@@ -1,7 +1,18 @@
 {
   "name": "hook-quiz-mini",
-  "description": "does my element stuff",
+  "description": "Polymer element that creates a customizable quiz.",
   "main": "hook-quiz-mini.html",
+  "version": "1.0.0",
+  "authors": [
+    "Matthew Cobbs <matt@byhook.com>",
+    "Jessica Agyemang <jessica.agyemang@byhook.com>",
+    "Herb Torres <herb.torres@byhook.com>"
+  ],
+  "license": "MIT",
+  "keywords": [
+    "web-components",
+    "quiz"
+  ],
   "dependencies": {
     "polymer": "Polymer/polymer#^2.0.0",
     "iron-pages": "PolymerElements/iron-pages#^2.0.0",
