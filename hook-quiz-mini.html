@@ -104,14 +104,14 @@ Custom property | Description | Default
       }
 
     </style>
-    <paper-ripple recenters></paper-ripple>
+    <paper-ripple id="ripple" noink recenters></paper-ripple>
     <paper-progress value="[[_getProgress(currentQuestion, totalQuestions)]]" class="transiting"></paper-progress>
     <iron-pages activate-event="" attr-for-selected="id" selected="[[page]]" id="questionsPanel">
       <div id="questions">
         <p id="questionText">[[question.text]]</p>
         <paper-radio-group selected="[[response]]" on-paper-radio-group-changed="_setResponse">
           <template is="dom-repeat" items="[[question.choices]]" as="choice">
-            <paper-radio-button name="[[choice.text]]" class="question-choices">[[choice.text]]</paper-radio-button>
+            <paper-radio-button name="[[choice.text]]" class="question-choices" noink on-down="_downAction" on-up="_upAction">[[choice.text]]</paper-radio-button>
           </template>
         </paper-radio-group>
       </div>
@@ -131,7 +131,7 @@ Custom property | Description | Default
      * @polymer
      * @demo demo/index.html
      */
-    class HookQuizMini extends AnimationMixin(Polymer.Element) {
+    class HookQuizMini extends AnimationMixin(Polymer.GestureEventListeners(Polymer.Element)) {
       static get is() { return 'hook-quiz-mini'; }
       static get properties() {
         return {
@@ -296,6 +296,14 @@ Custom property | Description | Default
         }
 
         return currentQuestion < totalQuestions ? 'questions' : 'score';
+      }
+
+      _downAction(e) {
+        this.$.ripple.downAction(e);
+      }
+
+      _upAction() {
+        this.$.ripple.upAction();
       }
 
       getNextQuestion() {
