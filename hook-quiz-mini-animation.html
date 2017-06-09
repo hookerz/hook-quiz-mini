@@ -41,7 +41,7 @@
                 {transform: 'translateX(0)', opacity: 1}
               ],
               revealResetBtn: [
-                {transform: 'scale(0.45)', opacity: 0},
+                {transform: 'scale(0)', opacity: 0},
                 {transform: 'scale(1)', opacity: 1}
               ]
             }
@@ -91,8 +91,7 @@
 
       // sets up and reveals next question
       lastAnimation.onfinish = () => {
-        this.currentQuestion++;
-
+        this.getNextQuestion();
         this._revealQuestionAnimation();
         this._revealAnswersAnimation();
       };
@@ -130,6 +129,7 @@
      */
     _revealScoreAnimation() {
       this.$.quizScore.animate(this.keyframes.revealScore, {
+        delay: 300,
         duration: this.baseDuration,
         easing: this.easing.easeExpo,
         fill: 'both'
@@ -141,7 +141,7 @@
      */
     _revealResetBtnAnimation() {
       this.$.resetBtn.animate(this.keyframes.revealResetBtn, {
-        delay: 450,
+        delay: 750,
         duration: this.baseDuration,
         easing: this.easing.easeBack,
         fill: 'both'
