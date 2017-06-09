@@ -21,14 +21,44 @@
   <body>
     <div class="vertical-section-container centered">
       <h3>Basic hook-quiz-mini demo</h3>
+
       <demo-snippet>
         <template>
+          <dom-bind>
+            <template>
+              <hook-quiz-mini questions="[[questions]]"></hook-quiz-mini>
+            </template>
+          </dom-bind>
 
-          <hook-quiz-mini questions='[{"text":"Cat or dog?","choices":[{"text":"Cat","correct":true},{"text":"Dog","correct":false}]},{"text":"Chicken or fish?","choices":[{"text":"Chicken","correct":false},{"text":"Fish","correct":true}]},{"text":"Six or twenty-seven?","choices":[{"text":"Six","correct":true},{"text":"Twenty-seven","correct":false}]}]'>
-          </hook-quiz-mini>
-
-        </template>
-      </demo-snippet>
-    </div>
+          <script>
+            var domBind = document.querySelector('dom-bind');
+            domBind.questions = [
+      	      {
+      	        "text": "Cat or dog?",
+      	        "choices": [
+      	          {"text": "Cat", "correct": true},
+      	          {"text": "Dog", "correct": false}
+      	        ]
+      	      },
+      	      {
+      	        "text": "Chicken or fish?",
+      	        "choices": [
+      	          {"text": "Chicken", "correct": false},
+      	          {"text": "Fish", "correct": true}
+      	        ]
+      	      },
+      	      {
+      	        "text": "Six or twenty-seven?",
+      	        "choices": [
+      	          {"text": "Six", "correct": true},
+      	          {"text": "Twenty-seven", "correct": false}
+      	        ]
+      	      }
+      	    ];
+          </script>
+        </div>
+      </template>
+    </demo-snippet>
+    
   </body>
 </html>
