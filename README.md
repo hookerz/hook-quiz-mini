@@ -24,9 +24,8 @@ bower install --save https://github.com/hookerz/hook-quiz-mini
 <!--
 ```
 <custom-element-demo>
-  <template style="font-family:sans-serif;">
+  <template>
     <script src="../webcomponentsjs/webcomponents-lite.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/web-animations/2.2.5/web-animations.min.js">
     <link rel="import" href="hook-quiz-mini.html">
     <next-code-block></next-code-block>
   </template>
