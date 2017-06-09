@@ -21,11 +21,12 @@ bower install --save https://github.com/hookerz/hook-quiz-mini
 
 ### Example
 
-<!-- 
+<!--
 ```
 <custom-element-demo>
-  <template>
+  <template style="font-family:sans-serif;">
     <script src="../webcomponentsjs/webcomponents-lite.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/web-animations/2.2.5/web-animations.min.js">
     <link rel="import" href="hook-quiz-mini.html">
     <next-code-block></next-code-block>
   </template>
@@ -96,7 +97,6 @@ The following custom properties and mixins are available for styling in `hook-qu
 
 ### Methods
 
-| Method name            | Description                        | 
+| Method name            | Description                        |
 | ---------------------- | ---------------------------------- |
 | getNextQuestion        | Gets the next quiz question        |  
-| getPreviousQuestion    | Gets the previous quiz question    |
