@@ -294,6 +294,18 @@ Custom property | Description | Default
         return currentQuestion < totalQuestions ? 'questions' : 'score';
       }
 
+      get getNextQuestion() {
+        const nextQuestion = this.currentQuestion + 1 === this.questions.length ? this.questions[0] : this.questions[this.currentQuestion + 1];
+
+        return nextQuestion;
+      }
+
+      get getPreviousQuestion() {
+        const prevQuestion = this.currentQuestion - 1 < 0 ? this.questions[this.questions.length - 1] : this.questions[this.currentQuestion - 1];
+
+        return prevQuestion;
+      }
+
     }
 
     window.customElements.define(HookQuizMini.is, HookQuizMini);

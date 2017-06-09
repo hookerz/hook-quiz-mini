@@ -58,7 +58,13 @@ bower install --save https://github.com/hookerz/hook-quiz-mini
         {"text": "Fish", "correct": true}
       ]
     },
-    ...
+    {
+      "text": "Six or twenty-seven?",
+      "choices": [
+        {"text": "Six", "correct": true},
+        {"text": "Twenty-seven", "correct": false}
+      ]
+    }
   ];
 </script>    
 ```
@@ -75,20 +81,22 @@ The following custom properties and mixins are available for styling in `hook-qu
 | `--hook-quiz-button-color`         | The hook-quiz-mini button color       | `#ff0050`                |
 | `--hook-quiz-button-text-color`    | The hook-quiz-mini button text color  | `#fff`                   |
 
-
-
 ### Attributes
 
-| Attribute name        | Description                        | Type     | Default          |
-| --------------------- | ---------------------------------- | :------: | ---------------- |
-| `questions`           | Questions to be asked in the quiz  | Array    | []               |
-
+| Attribute name      | Description                           | Type   | Default    |
+| ------------------- | ------------------------------------- | ------ | ---------- |
+| `question`          | Current quiz question                 | Object | {}         |
+| `questions`         | All quiz questions                    | Array  | []         |
+| `currentQuestion`   | Index of current quiz question        | Number | 0          |
+| `totalQuestions`    | Number of questions in the quiz       | Number | null       |
+| `answers`           | Correct answers to the quiz questions | Array  | []         |
+| `response`          | Answer chosen for current question    | String | ""         |
+| `responses`         | All answers chosen                    | Array  | []         |
+| `score`             | Quiz score                            | Number | 0          |
 
 ### Methods
 
-| Method name              | Description                        | 
-| :----------------------- | ---------------------------------- |
-| getNextQuestion()        | Gets the next quiz question        |  
-| getPreviousQuestion()    | Gets the previous quiz question    |
-| getResponses()           | Gets the responses                 |
-| getScore()               | Gets the quiz score                |
+| Method name            | Description                        | 
+| ---------------------- | ---------------------------------- |
+| getNextQuestion        | Gets the next quiz question        |  
+| getPreviousQuestion    | Gets the previous quiz question    |
