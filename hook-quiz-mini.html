@@ -136,70 +136,75 @@ Custom property | Description | Default
       static get properties() {
         return {
           /**
-          * @prop {Array} quiz questions
-          */
-          questions: {
-            type: Array,
-            value: () => [],
+           * @prop {Object} quiz data
+           */
+          quizData: {
+            type: Object,
+            value: null,
             observer: '_reset'
           },
           /**
-          * @prop {Array} quiz question choices
-          */
+           * @prop {Array} quiz questions
+           */
+          questions: {
+            type: Array,
+            computed: '_getQuestions(quizData)'
+          },
+          /**
+           * @prop {Array} quiz question choices
+           */
           answers: {
             type: Array,
             computed: '_getAnswers(questions)'
           },
           /**
-          * @prop {Array} quiz question answers
-          */
+           * @prop {Array} quiz question answers
+           */
           responses: {
             type: Array,
             value: () => []
           },
           /**
-          * @prop {Number} index of current question
-          */
+           * @prop {Number} index of current question
+           */
           currentQuestion: {
-            type: Number,
-            value: 0
+            type: Number
           },
           /**
-          * @prop {Number} length of total questions
-          */
+           * @prop {Number} length of total questions
+           */
           totalQuestions: {
             type: Number,
             computed: '_getTotalQuestions(questions)'
           },
           /**
-          * @prop {Object} quiz question data
-          */
+           * @prop {Object} quiz question data
+           */
           question: {
             type: Object,
             computed: '_getQuestion(questions, currentQuestion)'
           },
           /**
-          * @prop {String} current question answer
-          */
+           * @prop {String} current question answer
+           */
           response: {
             type: String,
             computed: '_getResponse(responses, currentQuestion)'
           },
           /**
-          * @prop {Number} quiz score
-          */
+           * @prop {Number} quiz score
+           */
           score: {
             type: Number,
             computed: '_getScore(answers, responses, totalQuestions)'
           },
           /**
-          * @prop {String} quiz or results view
-          */
+           * @prop {String} quiz or results view
+           */
           page: {
             type: String,
             computed: '_getPage(currentQuestion, totalQuestions)'
           }
-
         };
       }
 
@@ -207,8 +212,16 @@ Custom property | Description | Default
        * resets quiz
        */
       _reset() {
-        this.currentQuestion = 0;
         this.responses = this.questions.map(question => null);
+        this.currentQuestion = 0;
+      }
+
+      /**
+       * gets questions
+       * @param {quizData} Object passed in
+       */
+      _getQuestions(quizData) {
+        return quizData ? quizData.questions : [];
       }
 
       /**
@@ -309,7 +322,6 @@ Custom property | Description | Default
       getNextQuestion() {
         this.currentQuestion++
       }
-
     }
 
     window.customElements.define(HookQuizMini.is, HookQuizMini);

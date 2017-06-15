@@ -11,6 +11,7 @@
 
     <link rel="import" href="../../iron-demo-helpers/demo-pages-shared-styles.html">
     <link rel="import" href="../../iron-demo-helpers/demo-snippet.html">
+    <link rel="import" href="../../iron-ajax/iron-ajax.html">
     <link rel="import" href="../hook-quiz-mini.html">
 
     <custom-style>
@@ -26,39 +27,12 @@
         <template>
           <dom-bind>
             <template>
-              <hook-quiz-mini questions="[[questions]]"></hook-quiz-mini>
+              <iron-ajax auto url="quiz.json" last-response="{{quizData}}"></iron-ajax>
+              <hook-quiz-mini quiz-data="[[quizData]]"></hook-quiz-mini>
             </template>
           </dom-bind>
-
-          <script>
-            var domBind = document.querySelector('dom-bind');
-            domBind.questions = [
-      	      {
-      	        "text": "Cat or dog?",
-      	        "choices": [
-      	          {"text": "Cat", "correct": true},
-      	          {"text": "Dog", "correct": false}
-      	        ]
-      	      },
-      	      {
-      	        "text": "Chicken or fish?",
-      	        "choices": [
-      	          {"text": "Chicken", "correct": false},
-      	          {"text": "Fish", "correct": true}
-      	        ]
-      	      },
-      	      {
-      	        "text": "Six or twenty-seven?",
-      	        "choices": [
-      	          {"text": "Six", "correct": true},
-      	          {"text": "Twenty-seven", "correct": false}
-      	        ]
-      	      }
-      	    ];
-          </script>
-        </div>
-      </template>
-    </demo-snippet>
-    
+        </template>
+      </demo-snippet>
+    </div>
   </body>
 </html>

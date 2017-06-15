@@ -1,0 +1,43 @@
+{
+  "questions": [
+    {
+      "text": "Cat or dog?",
+      "choices": [
+        {
+          "text": "Cat",
+          "correct": true
+        },
+        {
+          "text": "Dog",
+          "correct": false
+        }
+      ]
+    },
+    {
+      "text": "Chicken or fish?",
+      "choices": [
+        {
+          "text": "Chicken",
+          "correct": false
+        },
+        {
+          "text": "Fish",
+          "correct": true
+        }
+      ]
+    },
+    {
+      "text": "Six or twenty-seven?",
+      "choices": [
+        {
+          "text": "Six",
+          "correct": true
+        },
+        {
+          "text": "Twenty-seven",
+          "correct": false
+        }
+      ]
+    }
+  ]
+}
