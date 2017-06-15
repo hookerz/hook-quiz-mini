@@ -18,143 +18,174 @@
         */
         keyframes: {
           type: Object,
-          value: () => {
-            return {
-              exitHorizontal: [
-                {transform: 'translateX(0)', opacity: 1},
-                {transform: 'translateX(100%)', opacity: 0}
-              ],
-              enterHorizontal: [
-                {transform: 'translateX(100%)', opacity: 0},
-                {transform: 'translateX(0)', opacity: 1}
-              ],
-              exitVertical: [
-                {transform: 'translateY(0)', opacity: 1},
-                {transform: 'translateY(20px)', opacity: 0}
-              ],
-              enterVertical: [
-                {transform: 'translateY(20px)', opacity: 0},
-                {transform: 'translateY(0)', opacity: 1}
-              ],
-              revealScore: [
-                {transform: 'translateX(-50px)', opacity: 0},
-                {transform: 'translateX(0)', opacity: 1}
-              ],
-              revealResetBtn: [
-                {transform: 'scale(0)', opacity: 0},
-                {transform: 'scale(1)', opacity: 1}
-              ]
-            }
-          }
+          value: () => ({
+            exitHorizontal: [
+              {transform: 'translateX(0)', opacity: 1},
+              {transform: 'translateX(100%)', opacity: 0}
+            ],
+            enterHorizontal: [
+              {transform: 'translateX(100%)', opacity: 0},
+              {transform: 'translateX(0)', opacity: 1}
+            ],
+            exitVertical: [
+              {transform: 'translateY(0)', opacity: 1},
+              {transform: 'translateY(20px)', opacity: 0}
+            ],
+            enterVertical: [
+              {transform: 'translateY(20px)', opacity: 0},
+              {transform: 'translateY(0)', opacity: 1}
+            ],
+            revealScore: [
+              {transform: 'translateX(-50px)', opacity: 0},
+              {transform: 'translateX(0)', opacity: 1}
+            ],
+            revealResetBtn: [
+              {transform: 'scale(0)', opacity: 0},
+              {transform: 'scale(1)', opacity: 1}
+            ]
+          })
         },
         /**
         * @prop {Object} easing cubic-bezier values
         */
         easing: {
           type: Object,
-          value: () => {
-            return {
-              easeMaterial: 'cubic-bezier(0.4, 0, 0.2, 1)',
-              easeExpo: 'cubic-bezier(0.19, 1, 0.22, 1)',
-              easeBack: 'cubic-bezier(0.175, 0.885, 0.32, 1.275)'
-            }
-          }
+          value: () => ({
+            easeMaterial: 'cubic-bezier(0.4, 0, 0.2, 1)',
+            easeExpo: 'cubic-bezier(0.19, 1, 0.22, 1)',
+            easeBack: 'cubic-bezier(0.175, 0.885, 0.32, 1.275)'
+          })
         }
 
       };
     }
 
-    /**
-     * fires when a choice is made
-     */
-    _quizTransitionAnimation() {
-      this.$.questionText.animate(this.keyframes.exitHorizontal, {
-        delay: 500,
-        duration: 600,
-        easing: this.easing.easeMaterial,
-        fill: 'both'
-      });
-
-      // loop through questions
-      // to stagger animations
-      const staggeredAnimations = this._currentQuestionChoices.map( (element, index) => {
-        return element.animate(this.keyframes.exitHorizontal, {
-          delay: 575 + (index * 100),
-          duration: this.baseDuration,
-          easing: this.easing.easeMaterial,
-          fill: 'both'
-        });
-
-      });
-
-      const lastAnimation = staggeredAnimations[staggeredAnimations.length - 1];
-
-      // sets up and reveals next question
-      lastAnimation.onfinish = () => {
-        this.getNextQuestion();
-        this._revealQuestionAnimation();
-        this._revealAnswersAnimation();
-      };
+    constructor() {
+      super();
+      this._questionsExit = this._questionsExit.bind(this);
+      this._questionsEnter = this._questionsEnter.bind(this);
+      this._scoreExit = this._scoreExit.bind(this);
+      this._scoreEnter = this._scoreEnter.bind(this);
     }
 
-    /**
-     * animation to reveal main question text
-     */
-    _revealQuestionAnimation() {
-      this.$.questionText.animate(this.keyframes.enterVertical, {
-        delay: 250,
-        duration: this.baseDuration,
-        easing: this.easing.easeMaterial,
-        fill: 'both'
-      });
+    connectedCallback() {
+      super.connectedCallback();
+      this.addEventListener('questions-exit', this._questionsExit);
+      this.addEventListener('questions-enter', this._questionsEnter);
+      this.addEventListener('score-exit', this._scoreExit);
+      this.addEventListener('score-enter', this._scoreEnter);
     }
 
-    /**
-     * animation to reveal quesiont choices
-     */
-    _revealAnswersAnimation() {
-
-      this._currentQuestionChoices.map( (element, index) => {
-        element.animate(this.keyframes.enterVertical, {
-          delay: 375 + (index * 100),
-          duration: this.baseDuration,
-          easing: this.easing.easeMaterial,
-          fill: 'both'
-        });
-      });
-    }
-
-    /**
-     * animation to reveal final score text
-     */
-    _revealScoreAnimation() {
-      this.$.quizScore.animate(this.keyframes.revealScore, {
-        delay: 300,
-        duration: this.baseDuration,
-        easing: this.easing.easeExpo,
-        fill: 'both'
-      });
-    }
-
-    /**
-     * animation to reveal Reset btn
-     */
-    _revealResetBtnAnimation() {
-      this.$.resetBtn.animate(this.keyframes.revealResetBtn, {
-        delay: 750,
-        duration: this.baseDuration,
-        easing: this.easing.easeBack,
-        fill: 'both'
-      });
+    disconnectedCallback() {
+      super.disconnectedCallback();
+      this.removeEventListener('questions-exit', this._questionsExit);
+      this.removeEventListener('questions-enter', this._questionsEnter);
+      this.removeEventListener('score-exit', this._scoreExit);
+      this.removeEventListener('score-enter', this._scoreEnter);
     }
 
     /**
      * gets current question choices to animate
      */
-    get _currentQuestionChoices() {
-      return Array.prototype.slice.call(
-        this.shadowRoot.querySelectorAll('.question-choices')
+    get _choices() {
+      return [].slice.call(
+        this.shadowRoot.querySelectorAll('.choice')
       );
+    }
+
+    /**
+     * fires when a choice is made
+     */
+    _questionsExit(e) {
+      const exitHorizontal = this.keyframes.exitHorizontal;
+      const easeMaterial = this.easing.easeMaterial;
+
+      this.$.questionText.animate(exitHorizontal, {
+        delay: 500,
+        duration: 600,
+        easing: easeMaterial,
+        fill: 'both'
+      });
+
+      const staggered = this._choices.map((element, index) => (
+        element.animate(exitHorizontal, {
+          delay: 575 + (index * 100),
+          duration: this.baseDuration,
+          easing: easeMaterial,
+          fill: 'both'
+        })
+      ));
+
+      const last = staggered[staggered.length - 1];
+      if (last && e.detail) last.onfinish = e.detail.onComplete;
+    }
+
+    _questionsEnter(e) {
+      const enterVertical = this.keyframes.enterVertical;
+      const easeMaterial = this.easing.easeMaterial;
+
+      this.$.questionText.animate(enterVertical, {
+        delay: 250,
+        duration: this.baseDuration,
+        easing: easeMaterial,
+        fill: 'both'
+      });
+
+      const staggered = this._choices.map((element, index) => (
+        element.animate(enterVertical, {
+          delay: 375 + (index * 100),
+          duration: this.baseDuration,
+          easing: easeMaterial,
+          fill: 'both'
+        })
+      ));
+
+      const last = staggered[staggered.length - 1];
+      if (last && e.detail) last.onfinish = e.detail.onComplete;
+    }
+
+    _scoreEnter(e) {
+      const revealScore = this.keyframes.revealScore;
+      const revealResetBtn = this.keyframes.revealResetBtn;
+      const easeExpo = this.easing.easeExpo;
+      const easeBack = this.easing.easeBack;
+
+      this.$.quizScore.animate(revealScore, {
+        delay: 0,
+        duration: this.baseDuration,
+        easing: easeExpo,
+        fill: 'both'
+      });
+
+      const last = this.$.resetBtn.animate(revealResetBtn, {
+        delay: 450,
+        duration: this.baseDuration,
+        easing: easeBack,
+        fill: 'both'
+      });
+
+      if (last && e.detail) last.onfinish = e.detail.onComplete;
+    }
+
+    _scoreExit(e) {
+      const exitHorizontal = this.keyframes.exitHorizontal;
+      const easeMaterial = this.easing.easeMaterial;
+
+      this.$.quizScore.animate(exitHorizontal, {
+        delay: 500,
+        duration: 600,
+        easing: easeMaterial,
+        fill: 'both'
+      });
+
+      const last = this.$.resetBtn.animate(exitHorizontal, {
+        delay: 575,
+        duration: this.baseDuration,
+        easing: easeMaterial,
+        fill: 'both'
+      });
+
+      if (last && e.detail) last.onfinish = e.detail.onComplete;
     }
   };
 

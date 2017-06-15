@@ -1,40 +1,40 @@
 {
   "questions": [
     {
-      "text": "Cat or dog?",
+      "text": "1 + 1?",
       "choices": [
         {
-          "text": "Cat",
+          "text": "2",
           "correct": true
         },
         {
-          "text": "Dog",
+          "text": "1",
           "correct": false
         }
       ]
     },
     {
-      "text": "Chicken or fish?",
+      "text": "10 + 1?",
       "choices": [
         {
-          "text": "Chicken",
+          "text": "101",
           "correct": false
         },
         {
-          "text": "Fish",
+          "text": "11",
           "correct": true
         }
       ]
     },
     {
-      "text": "Six or twenty-seven?",
+      "text": "2 + 2?",
       "choices": [
         {
-          "text": "Six",
+          "text": "4",
           "correct": true
         },
         {
-          "text": "Twenty-seven",
+          "text": "5",
           "correct": false
         }
       ]
