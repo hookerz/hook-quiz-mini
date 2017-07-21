@@ -1,0 +1,192 @@
+<link rel="import" href="../polymer/polymer-element.html">
+
+<script>
+
+  const AnimationMixin = superclass => class extends superclass {
+
+    static get properties() {
+      return {
+        /**
+        * @prop {Number} general animation duration value
+        */
+        baseDuration: {
+          type: Number,
+          value: 300
+        },
+        /**
+        * @prop {Object} keyframes
+        */
+        keyframes: {
+          type: Object,
+          value: () => ({
+            exitHorizontal: [
+              {transform: 'translateX(0)', opacity: 1},
+              {transform: 'translateX(100%)', opacity: 0}
+            ],
+            enterHorizontal: [
+              {transform: 'translateX(100%)', opacity: 0},
+              {transform: 'translateX(0)', opacity: 1}
+            ],
+            exitVertical: [
+              {transform: 'translateY(0)', opacity: 1},
+              {transform: 'translateY(20px)', opacity: 0}
+            ],
+            enterVertical: [
+              {transform: 'translateY(20px)', opacity: 0},
+              {transform: 'translateY(0)', opacity: 1}
+            ],
+            revealScore: [
+              {transform: 'translateX(-50px)', opacity: 0},
+              {transform: 'translateX(0)', opacity: 1}
+            ],
+            revealResetBtn: [
+              {transform: 'scale(0)', opacity: 0},
+              {transform: 'scale(1)', opacity: 1}
+            ]
+          })
+        },
+        /**
+        * @prop {Object} easing cubic-bezier values
+        */
+        easing: {
+          type: Object,
+          value: () => ({
+            easeMaterial: 'cubic-bezier(0.4, 0, 0.2, 1)',
+            easeExpo: 'cubic-bezier(0.19, 1, 0.22, 1)',
+            easeBack: 'cubic-bezier(0.175, 0.885, 0.32, 1.275)'
+          })
+        }
+
+      };
+    }
+
+    constructor() {
+      super();
+      this._questionsExit = this._questionsExit.bind(this);
+      this._questionsEnter = this._questionsEnter.bind(this);
+      this._scoreExit = this._scoreExit.bind(this);
+      this._scoreEnter = this._scoreEnter.bind(this);
+    }
+
+    connectedCallback() {
+      super.connectedCallback();
+      this.addEventListener('questions-exit', this._questionsExit);
+      this.addEventListener('questions-enter', this._questionsEnter);
+      this.addEventListener('score-exit', this._scoreExit);
+      this.addEventListener('score-enter', this._scoreEnter);
+    }
+
+    disconnectedCallback() {
+      super.disconnectedCallback();
+      this.removeEventListener('questions-exit', this._questionsExit);
+      this.removeEventListener('questions-enter', this._questionsEnter);
+      this.removeEventListener('score-exit', this._scoreExit);
+      this.removeEventListener('score-enter', this._scoreEnter);
+    }
+
+    /**
+     * gets current question choices to animate
+     */
+    get _choices() {
+      return [].slice.call(
+        this.shadowRoot.querySelectorAll('.choice')
+      );
+    }
+
+    /**
+     * fires when a choice is made
+     */
+    _questionsExit(e) {
+      const exitHorizontal = this.keyframes.exitHorizontal;
+      const easeMaterial = this.easing.easeMaterial;
+
+      this.$.questionText.animate(exitHorizontal, {
+        delay: 500,
+        duration: 600,
+        easing: easeMaterial,
+        fill: 'both'
+      });
+
+      const staggered = this._choices.map((element, index) => (
+        element.animate(exitHorizontal, {
+          delay: 575 + (index * 100),
+          duration: this.baseDuration,
+          easing: easeMaterial,
+          fill: 'both'
+        })
+      ));
+
+      const last = staggered[staggered.length - 1];
+      if (last && e.detail) last.onfinish = e.detail.onComplete;
+    }
+
+    _questionsEnter(e) {
+      const enterVertical = this.keyframes.enterVertical;
+      const easeMaterial = this.easing.easeMaterial;
+
+      this.$.questionText.animate(enterVertical, {
+        delay: 250,
+        duration: this.baseDuration,
+        easing: easeMaterial,
+        fill: 'both'
+      });
+
+      const staggered = this._choices.map((element, index) => (
+        element.animate(enterVertical, {
+          delay: 375 + (index * 100),
+          duration: this.baseDuration,
+          easing: easeMaterial,
+          fill: 'both'
+        })
+      ));
+
+      const last = staggered[staggered.length - 1];
+      if (last && e.detail) last.onfinish = e.detail.onComplete;
+    }
+
+    _scoreEnter(e) {
+      const revealScore = this.keyframes.revealScore;
+      const revealResetBtn = this.keyframes.revealResetBtn;
+      const easeExpo = this.easing.easeExpo;
+      const easeBack = this.easing.easeBack;
+
+      this.$.quizScore.animate(revealScore, {
+        delay: 0,
+        duration: this.baseDuration,
+        easing: easeExpo,
+        fill: 'both'
+      });
+
+      const last = this.$.resetBtn.animate(revealResetBtn, {
+        delay: 450,
+        duration: this.baseDuration,
+        easing: easeBack,
+        fill: 'both'
+      });
+
+      if (last && e.detail) last.onfinish = e.detail.onComplete;
+    }
+
+    _scoreExit(e) {
+      const exitHorizontal = this.keyframes.exitHorizontal;
+      const easeMaterial = this.easing.easeMaterial;
+
+      this.$.quizScore.animate(exitHorizontal, {
+        delay: 500,
+        duration: 600,
+        easing: easeMaterial,
+        fill: 'both'
+      });
+
+      const last = this.$.resetBtn.animate(exitHorizontal, {
+        delay: 575,
+        duration: this.baseDuration,
+        easing: easeMaterial,
+        fill: 'both'
+      });
+
+      if (last && e.detail) last.onfinish = e.detail.onComplete;
+    }
+  };
+
+</script>
