@@ -3,160 +3,327 @@
 <link rel="import" href="../iron-pages/iron-pages.html">
 <link rel="import" href="../paper-button/paper-button.html">
 <link rel="import" href="../paper-progress/paper-progress.html">
+<link rel="import" href="../paper-ripple/paper-ripple.html">
 <link rel="import" href="../paper-radio-group/paper-radio-group.html">
+<link rel="import" href="./hook-quiz-mini-animation.html">
+
+<!--
+`<hook-quiz-mini>` is a custom quiz element. Add custom questions and answers, define the right answers and `<hook-quiz-mini>` tallies and displays the score along with a `Reset` button.
+    <iron-ajax auto url="quiz.json" last-response="{{quizData}}" debounce-duration="500"></iron-ajax>
+    <hook-quiz-mini quiz-data="[[quizData]]"></hook-quiz-mini>
+
+### Styling
+The following custom properties and mixins are available for styling:
+Custom property | Description | Default
+----------------|-------------|----------
+`--hook-quiz-ripple-color` | paper ripple color | rgba(255, 0, 80, .5)
+`--hook-quiz-button-text-color` | Reset button text color | #fff
+`--hook-quiz-button-color` | Reset button background color | #ff0050
+`--hook-quiz-choice-checked-color` | paper radio button color | #ff0050
+`--hook-quiz-progress-bar-color` | paper progress bar color | #ff0050
+`--hook-quiz-typography` | Mixin applied to the quiz text | {}
+`--hook-quiz-progress-bar` | Mixin applied to the paper progress bar | `{}`
+`--hook-quiz-choices-container` | Mixin applied to the paper radio group | `{}`
+`--hook-quiz-mini` | Mixin applied to the hook-quiz-mini element | `{}`
+
+@element hook-quiz-mini
+@demo demo/index.html
+-->
 
 <dom-module id="hook-quiz-mini">
   <template>
     <style>
       :host {
         display: block;
+        position: relative;
+        overflow: hidden;
+        padding: 0 25px;
+        -webkit-box-sizing: border-box;
+        box-sizing: border-box;
+        --hook-quiz-progress-bar-color: #ff0050;
+        --hook-quiz-choice-checked-color: #ff0050;
+        --hook-quiz-button-color: #ff0050;
+        --hook-quiz-button-text-color: #fff;
+        --hook-quiz-ripple-color: rgba(255, 0, 80, .5);
+        @apply(--hook-quiz-mini);
+
       }
 
       p {
         font-size: 2em;
         line-height: 1em;
+        @apply(--hook-quiz-typography);
+      }
+
+      paper-ripple {
+        color: var(--hook-quiz-ripple-color);
       }
 
       paper-progress {
         width: 100%;
+        --paper-progress-active-color: var(--hook-quiz-progress-bar-color);
+        --paper-progress-transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+        --paper-progress-transition-duration: 0.4s;
+        @apply(--hook-quiz-progress-bar);
+      }
+
+      iron-pages {
+        min-height: 162px;
       }
 
       paper-radio-group {
+        display: -webkit-flex;
+        display: -ms-flex;
         display: flex;
+        -webkit-flex-direction: column;
         flex-direction: column;
+        @apply(--hook-quiz-choices-container);
+      }
+
+      paper-radio-button {
+        --paper-radio-button-checked-color: var(--hook-quiz-choice-checked-color);
       }
 
       paper-button {
-        background: navy;
-        color: white;
+        background: var(--hook-quiz-button-color);
+        color: var(--hook-quiz-button-text-color);
       }
+
     </style>
-    <paper-progress value="[[_getProgress(currentQuestion, totalQuestions)]]"></paper-progress>
+    <paper-ripple id="ripple" noink recenters></paper-ripple>
+    <paper-progress value="[[currentProgress]]" class="transiting"></paper-progress>
     <iron-pages activate-event="" attr-for-selected="id" selected="[[page]]">
       <div id="questions">
-        <p>[[question.text]]</p>
-        <paper-radio-group selected="[[response]]" on-paper-radio-group-changed="_setResponse">
-          <template is="dom-repeat" items="[[question.choices]]" as="choice">
-            <paper-radio-button name="[[choice.text]]">[[choice.text]]</paper-radio-button>
+        <p id="questionText">[[currentQuestion.text]]</p>
+        <paper-radio-group selected="[[currentResponse]]" on-paper-radio-group-changed="_onPaperRadioGroupChanged">
+          <template is="dom-repeat" items="[[currentQuestion.choices]]" as="choice">
+            <paper-radio-button name="[[choice.text]]" class="choice" noink on-down="_onButtonDown" on-up="_onButtonUp">[[choice.text]]</paper-radio-button>
           </template>
         </paper-radio-group>
       </div>
       <div id="score">
-        <p>You scored [[score]]%!</p>
-        <paper-button raised on-click="_reset">Reset</paper-button>
+        <p id="quizScore">You scored [[currentScore]]%!</p>
+        <paper-button raised on-click="reset" id="resetBtn">Reset</paper-button>
       </div>
     </iron-pages>
   </template>
 
   <script>
     /**
-     * `hook-quiz-mini`
-     * does my element stuff
+     * `<hook-quiz-mini>` is Polymer 2 web component to display a list of
+     * questions as an interactive multiple choice quiz.
      *
      * @customElement
      * @polymer
      * @demo demo/index.html
      */
-    class HookQuizMini extends Polymer.Element {
+    class HookQuizMini extends AnimationMixin(Polymer.GestureEventListeners(Polymer.Element)) {
       static get is() { return 'hook-quiz-mini'; }
       static get properties() {
         return {
-          questions: {
-            type: Array,
-            value: () => [],
-            observer: '_reset'
+          /**
+           * From external source
+           *
+           * @type {{questions: Array<Object>}}
+           */
+          quizData: {
+            type: Object,
+            value: null,
+            observer: 'reset'
           },
-          answers: {
-            type: Array,
-            computed: '_getAnswers(questions)'
-          },
+          /** Contains user responses to each question */
           responses: {
             type: Array,
             value: () => []
           },
-          currentQuestion: {
+          /** Index of current question */
+          currentIndex: {
             type: Number,
-            value: 0
+            value: null,
+            observer: '_onCurrentIndexChanged'
           },
-          totalQuestions: {
-            type: Number,
-            computed: '_getTotalQuestions(questions)'
-          },
-          question: {
-            type: Object,
-            computed: '_getQuestion(questions, currentQuestion)'
-          },
-          response: {
-            type: String,
-            computed: '_getResponse(responses, currentQuestion)'
-          },
-          score: {
-            type: Number,
-            computed: '_getScore(answers, responses, totalQuestions)'
-          },
+          /** Quiz view */
           page: {
             type: String,
-            computed: '_getPage(currentQuestion, totalQuestions)'
+            value: 'questions'
+          },
+          /** Contains questions for current quiz */
+          questions: {
+            type: Array,
+            computed: '_getQuestions(quizData)'
+          },
+          /** Correct choice for each question */
+          answers: {
+            type: Array,
+            computed: '_getAnswers(questions)'
+          },
+          /** As percentage of quiz length */
+          currentProgress: {
+            type: Number,
+            computed: '_getCurrentProgress(questions, currentIndex)'
+          },
+          /** Current question */
+          currentQuestion: {
+            type: Object,
+            computed: '_getCurrentQuestion(questions, currentIndex)'
+          },
+          /** Current question user response */
+          currentResponse: {
+            type: String,
+            computed: '_getCurrentResponse(responses, currentIndex)'
+          },
+          /** Current score */
+          currentScore: {
+            type: Number,
+            computed: '_getCurrentScore(questions, answers, responses)'
           }
         };
       }
 
-      _reset() {
-        this.currentQuestion = 0;
-        this.responses = this.questions.map(question => null);
+      /**
+       * Increment current index
+       */
+      nextQuestion() {
+        this.currentIndex++
       }
 
+      /**
+       * Reset user responses and current index
+       */
+      reset() {
+        if (this.questions.length) {
+          this.responses = this.questions.map(question => null);
+          this.currentIndex = 0;
+        }
+      }
+
+      /**
+       * gets questions
+       * @param {quizData} Object with questions property
+       */
+      _getQuestions(quizData) {
+        return quizData ? quizData.questions : [];
+      }
+
+      /**
+       * gets correct answer
+       * @param {questions} Array quiz questions
+       */
       _getAnswers(questions) {
         return this.questions.map(question => (
           question.choices.filter(choice => choice.correct)[0]
         ));
       }
 
-      _getTotalQuestions(questions) {
-        return questions.length;
+      /**
+       * returns progress value for paper progress bar
+       * @param {questions} Array quiz questions
+       * @param {currentIndex} Number index of current question
+       */
+      _getCurrentProgress(questions, currentIndex) {
+        return currentIndex / questions.length * 100;
       }
 
-      _getProgress(currentQuestion, totalQuestions) {
-        return currentQuestion / totalQuestions * 100;
+      /**
+       * returns current question data
+       * @param {questions} Array quiz questions
+       * @param {currentIndex} Number index of current question
+       */
+      _getCurrentQuestion(questions, currentIndex) {
+        return questions[currentIndex];
       }
 
-      _getQuestion(questions, currentQuestion) {
-        return questions[currentQuestion];
+      /**
+       * returns current question choice
+       * @param {responses} Array quiz question responses
+       * @param {currentIndex} Number index of current question
+       */
+      _getCurrentResponse(responses, currentIndex) {
+        return responses[currentIndex];
       }
 
-      _getResponse(responses, currentQuestion) {
-        return responses[currentQuestion];
-      }
-
-      _getScore(answers, responses, totalQuestions) {
+      /**
+       * returns score
+       * @param {questions} Array quiz questions
+       * @param {answers} Array quiz question choices
+       * @param {responses} Array quiz question responses
+       */
+      _getCurrentScore(questions, answers, responses) {
         const correct = responses.reduce((acc, response, index) => (
           acc + (answers[index] && response === answers[index].text)
         ), 0);
-        return Math.round(correct / totalQuestions * 100);
+        return Math.round(correct / questions.length * 100);
       }
 
-      _setResponse(e) {
-        // TODO create exit and entry animation here to transition between
-        // questions. currentQuestion update should occur after exit animation
-        // has completed
+      /**
+       * sets current question choice/answer
+       * @param {string} selected The user selected response
+       * @param {number} currentIndex The current question index
+       */
+      _setResponse(selected, currentIndex) {
+        this.responses = this.responses.map((response, index) => (
+          response = (index === currentIndex) ? selected : response
+        ));
 
-        console.log('start animation here');
-        Polymer.Async.microTask.run(() => {
-          const currentQuestion = this.currentQuestion;
-          this.responses = this.responses.map((response, index) => (
-            response = (index === currentQuestion) ? e.target.selected : response
-          ));
-          this.currentQuestion++;
-          console.log('finish animation here');
-        });
+        this.dispatchEvent(new CustomEvent('questions-exit', {
+          detail: {
+            onComplete: () => this.nextQuestion()
+          }
+        }));
       }
 
-      _getPage(currentQuestion, totalQuestions) {
-        // TODO create exit and entry animation here to transition between
-        // pages. The only transition is between the questions view and the
-        // final score view.
+      /**
+       * @param {Event} e The paper-radio-group-changed event
+       */
+      _onPaperRadioGroupChanged(e) {
+        this._setResponse(e.target.selected, this.currentIndex);
+      }
 
-        return currentQuestion < totalQuestions ? 'questions' : 'score';
+      /**
+       * Trigger ripple down action from radio button
+       * @param {Event} e
+       */
+      _onButtonDown(e) {
+        this.$.ripple.downAction(e);
+      }
+
+      /**
+       * Trigger ripple up action from radio button
+       * @param {Event} e
+       */
+      _onButtonUp(e) {
+        this.$.ripple.upAction(e);
+      }
+
+      /**
+       * Change to appropriate page based on current index
+       */
+      _onCurrentIndexChanged() {
+        const page = !this.questions.length || this.currentIndex < this.questions.length
+            ? 'questions'
+            : 'score';
+
+        if (this.page === 'questions') {
+          this._toPage(page);
+        } else {
+          this._fromToPage(this.page, page);
+        }
+      }
+
+      _toPage(to) {
+        this.page = to;
+        this.dispatchEvent(new CustomEvent(`${to}-enter`));
+      }
+
+      _fromToPage(from, to) {
+        this.dispatchEvent(new CustomEvent(`${from}-exit`, {
+          detail: {
+            onComplete: () => {
+              this.page = to;
+              this.dispatchEvent(new CustomEvent(`${to}-enter`));
+            }
+          }
+        }));
       }
     }
 
