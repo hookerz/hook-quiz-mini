@@ -9,42 +9,30 @@
     <script src="../../webcomponentsjs/webcomponents-lite.js"></script>
     <script src="../../web-component-tester/browser.js"></script>
 
+    <link rel="import" href="../../iron-demo-helpers/demo-pages-shared-styles.html">
+    <link rel="import" href="../../iron-demo-helpers/demo-snippet.html">
+    <link rel="import" href="../../iron-ajax/iron-ajax.html">
     <link rel="import" href="../hook-quiz-mini.html">
+
   </head>
   <body>
 
     <test-fixture id="BasicTestFixture">
       <template>
-        <hook-quiz-mini></hook-quiz-mini>
-      </template>
-    </test-fixture>
-
-    <test-fixture id="ChangedPropertyTestFixture">
-      <template>
-        <hook-quiz-mini prop1="new-prop1"></hook-quiz-mini>
+        <iron-ajax auto url="quiz.json" last-response="{{quizData}}"></iron-ajax>
+        <hook-quiz-mini quiz-data="[[quizData]]"></hook-quiz-mini>
       </template>
     </test-fixture>
 
     <script>
-      suite('hook-quiz-mini', function() {
-
-        test('instantiating the element with default properties works', function() {
-          var element = fixture('BasicTestFixture');
-          assert.equal(element.prop1, 'hook-quiz-mini');
-          var elementShadowRoot = element.shadowRoot;
-          var elementHeader = elementShadowRoot.querySelector('h2');
-          assert.equal(elementHeader.innerHTML, 'Hello hook-quiz-mini!');
+      suite('<hook-quiz-mini>', function() {
+        var myEl;
+        setup(function() {
+          myEl = fixture('BasicTestFixture');
         });
-
-        test('setting a property on the element works', function() {
-          // Create a test fixture
-          var element = fixture('ChangedPropertyTestFixture');
-          assert.equal(element.prop1, 'new-prop1');
-          var elementShadowRoot = element.shadowRoot;
-          var elementHeader = elementShadowRoot.querySelector('h2');
-          assert.equal(elementHeader.innerHTML, 'Hello new-prop1!');
+        test('defines the "quiz data" property', function() {
+          assert.equal(myEl.quizData, this.quizData);
         });
-
       });
     </script>
 
